@@ -1,0 +1,2 @@
+../Src/OLEDScreenDriver.c:10:6:printToScreen	16	static
+../Src/OLEDScreenDriver.c:14:6:clearScreen	4	static
