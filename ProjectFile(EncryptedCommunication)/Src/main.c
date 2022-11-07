@@ -114,7 +114,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  //Testssd1306Driver();
+	  Testssd1306Driver();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
