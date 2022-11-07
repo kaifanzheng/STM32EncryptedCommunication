@@ -4,7 +4,7 @@
  *  Created on: Nov 7, 2022
  *      Author: m
  */
-#include "testsdd1306.h"
+#include <testFunctionalities.h>
 
 void Testssd1306Driver(){
 	  SSD1306_Init();
@@ -52,4 +52,15 @@ void Testssd1306Driver(){
 			HAL_Delay (500);
 		 }
 	  }
+}
+
+void testOLEDScreenDriverPrint(){
+	  InitScreen();
+	  printToScreen("hello world");
+	  printToScreen("welcome to the club");
+	  printToScreen("it is not a joke");
+	  printToScreen("it is not a joke");
+	  printToScreen("it is not a joke");
+	  printToScreen("it is not a joke");
+	  //printToScreen("it is not a joke");
 }

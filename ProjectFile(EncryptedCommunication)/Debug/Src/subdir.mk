@@ -14,7 +14,7 @@ C_SRCS += \
 ../Src/syscalls.c \
 ../Src/sysmem.c \
 ../Src/system_stm32l4xx.c \
-../Src/testsdd1306.c 
+../Src/testFunctionalities.c 
 
 OBJS += \
 ./Src/OLEDScreenDriver.o \
@@ -26,7 +26,7 @@ OBJS += \
 ./Src/syscalls.o \
 ./Src/sysmem.o \
 ./Src/system_stm32l4xx.o \
-./Src/testsdd1306.o 
+./Src/testFunctionalities.o 
 
 C_DEPS += \
 ./Src/OLEDScreenDriver.d \
@@ -38,7 +38,7 @@ C_DEPS += \
 ./Src/syscalls.d \
 ./Src/sysmem.d \
 ./Src/system_stm32l4xx.d \
-./Src/testsdd1306.d 
+./Src/testFunctionalities.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
@@ -48,7 +48,7 @@ Src/%.o Src/%.su: ../Src/%.c Src/subdir.mk
 clean: clean-Src
 
 clean-Src:
-	-$(RM) ./Src/OLEDScreenDriver.d ./Src/OLEDScreenDriver.o ./Src/OLEDScreenDriver.su ./Src/fonts.d ./Src/fonts.o ./Src/fonts.su ./Src/main.d ./Src/main.o ./Src/main.su ./Src/ssd1306.d ./Src/ssd1306.o ./Src/ssd1306.su ./Src/stm32l4xx_hal_msp.d ./Src/stm32l4xx_hal_msp.o ./Src/stm32l4xx_hal_msp.su ./Src/stm32l4xx_it.d ./Src/stm32l4xx_it.o ./Src/stm32l4xx_it.su ./Src/syscalls.d ./Src/syscalls.o ./Src/syscalls.su ./Src/sysmem.d ./Src/sysmem.o ./Src/sysmem.su ./Src/system_stm32l4xx.d ./Src/system_stm32l4xx.o ./Src/system_stm32l4xx.su ./Src/testsdd1306.d ./Src/testsdd1306.o ./Src/testsdd1306.su
+	-$(RM) ./Src/OLEDScreenDriver.d ./Src/OLEDScreenDriver.o ./Src/OLEDScreenDriver.su ./Src/fonts.d ./Src/fonts.o ./Src/fonts.su ./Src/main.d ./Src/main.o ./Src/main.su ./Src/ssd1306.d ./Src/ssd1306.o ./Src/ssd1306.su ./Src/stm32l4xx_hal_msp.d ./Src/stm32l4xx_hal_msp.o ./Src/stm32l4xx_hal_msp.su ./Src/stm32l4xx_it.d ./Src/stm32l4xx_it.o ./Src/stm32l4xx_it.su ./Src/syscalls.d ./Src/syscalls.o ./Src/syscalls.su ./Src/sysmem.d ./Src/sysmem.o ./Src/sysmem.su ./Src/system_stm32l4xx.d ./Src/system_stm32l4xx.o ./Src/system_stm32l4xx.su ./Src/testFunctionalities.d ./Src/testFunctionalities.o ./Src/testFunctionalities.su
 
 .PHONY: clean-Src
 

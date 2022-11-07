@@ -12,7 +12,7 @@
 #include "ssd1306.h"
 
 void Testssd1306Driver();
-
+void testOLEDScreenDriverPrint();
 
 
 #endif /* INC_TESTSDD1306_H_ */

@@ -1,0 +1,2 @@
+../Src/testFunctionalities.c:9:6:Testssd1306Driver	24	static
+../Src/testFunctionalities.c:57:6:testOLEDScreenDriverPrint	8	static

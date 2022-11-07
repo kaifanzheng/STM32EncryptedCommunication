@@ -31,7 +31,8 @@ Src/main.o: ../Src/main.c ../Inc/main.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_pwr_ex.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_tim.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_tim_ex.h \
- ../Inc/testsdd1306.h ../Inc/fonts.h ../Inc/main.h ../Inc/ssd1306.h
+ ../Inc/testFunctionalities.h ../Inc/fonts.h ../Inc/main.h \
+ ../Inc/ssd1306.h ../Inc/OLEDScreenDriver.h
 ../Inc/main.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal.h:
 ../Inc/stm32l4xx_hal_conf.h:
@@ -65,7 +66,8 @@ Src/main.o: ../Src/main.c ../Inc/main.h \
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_pwr_ex.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_tim.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_tim_ex.h:
-../Inc/testsdd1306.h:
+../Inc/testFunctionalities.h:
 ../Inc/fonts.h:
 ../Inc/main.h:
 ../Inc/ssd1306.h:
+../Inc/OLEDScreenDriver.h:

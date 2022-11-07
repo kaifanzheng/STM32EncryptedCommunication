@@ -1,5 +1,5 @@
-Src/testsdd1306.o: ../Src/testsdd1306.c ../Inc/testsdd1306.h \
- ../Inc/fonts.h ../Inc/main.h \
+Src/testFunctionalities.o: ../Src/testFunctionalities.c \
+ ../Inc/testFunctionalities.h ../Inc/fonts.h ../Inc/main.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal.h \
  ../Inc/stm32l4xx_hal_conf.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_rcc.h \
@@ -33,7 +33,7 @@ Src/testsdd1306.o: ../Src/testsdd1306.c ../Inc/testsdd1306.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_tim.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_tim_ex.h \
  ../Inc/ssd1306.h
-../Inc/testsdd1306.h:
+../Inc/testFunctionalities.h:
 ../Inc/fonts.h:
 ../Inc/main.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal.h:

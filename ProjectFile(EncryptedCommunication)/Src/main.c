@@ -21,7 +21,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "testsdd1306.h"
+#include <testFunctionalities.h>
+#include "OLEDScreenDriver.h"
 
 /* USER CODE END Includes */
 
@@ -107,6 +108,7 @@ int main(void)
   MX_OCTOSPI1_Init();
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
+  testOLEDScreenDriverPrint();
 
   /* USER CODE END 2 */
 
@@ -114,7 +116,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  Testssd1306Driver();
+	  //Testssd1306Driver();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

@@ -27,5 +27,5 @@
 "./Src/syscalls.o"
 "./Src/sysmem.o"
 "./Src/system_stm32l4xx.o"
-"./Src/testsdd1306.o"
+"./Src/testFunctionalities.o"
 "./Startup/startup_stm32l4s5vitx.o"

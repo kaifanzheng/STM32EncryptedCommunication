@@ -1,2 +1,3 @@
-../Src/OLEDScreenDriver.c:10:6:printToScreen	16	static
-../Src/OLEDScreenDriver.c:14:6:clearScreen	4	static
+../Src/OLEDScreenDriver.c:15:6:clearScreen	8	static
+../Src/OLEDScreenDriver.c:20:6:printToScreen	16	static
+../Src/OLEDScreenDriver.c:30:6:InitScreen	8	static
