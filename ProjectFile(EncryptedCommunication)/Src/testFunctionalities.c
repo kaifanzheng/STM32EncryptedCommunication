@@ -62,7 +62,12 @@ void testOLEDScreenDriverPrint(){
 	  printToScreen("it is not a joke");
 	  printToScreen("it is not a joke");
 	  printToScreen("it is not a joke");
-	  //printToScreen("it is not a joke");
+	  HAL_Delay(5000);
+	  printToScreen("it is a big joke");
+	  printToScreen(" ");
+	  printToScreen("it is a big joke2");
+	  HAL_Delay(5000);
+	  clearScreen();
 }
 
 void testKeypadDriver(){

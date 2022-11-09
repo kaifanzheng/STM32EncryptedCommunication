@@ -108,7 +108,7 @@ int main(void)
   MX_OCTOSPI1_Init();
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
-  //testOLEDScreenDriverPrint();
+
   //Testssd1306Driver();
 
   /* USER CODE END 2 */
@@ -117,7 +117,8 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  testKeypadDriver();
+	  //testKeypadDriver();
+	  testOLEDScreenDriverPrint();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

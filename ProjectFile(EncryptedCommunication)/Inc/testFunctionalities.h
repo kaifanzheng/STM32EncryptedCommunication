@@ -11,6 +11,7 @@
 #include "fonts.h"
 #include "ssd1306.h"
 #include "keypadDriver.h"
+#include "OLEDScreenDriver.h"
 void Testssd1306Driver();
 void testOLEDScreenDriverPrint();
 void testKeypadDriver();
