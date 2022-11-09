@@ -10,9 +10,10 @@
 
 #include "fonts.h"
 #include "ssd1306.h"
-
+#include "keypadDriver.h"
 void Testssd1306Driver();
 void testOLEDScreenDriverPrint();
+void testKeypadDriver();
 
 
 #endif /* INC_TESTSDD1306_H_ */

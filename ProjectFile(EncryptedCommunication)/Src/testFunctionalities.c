@@ -64,3 +64,15 @@ void testOLEDScreenDriverPrint(){
 	  printToScreen("it is not a joke");
 	  //printToScreen("it is not a joke");
 }
+
+void testKeypadDriver(){
+	while(1){
+		char buf[1];
+		char result = getOneCharFromKeypad();
+		buf[0] = result;
+		InitScreen();
+		printToScreen(buf);
+		HAL_Delay(5000);
+		clearScreen();
+	}
+}
