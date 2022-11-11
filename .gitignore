@@ -1,0 +1,14 @@
+.cproject
+.dep/
+.project
+.settings/
+
+# make and build files
+*.lst
+*.o
+*.eep
+*.lss
+*.map
+*.sym
+*.elf
+*.hex
