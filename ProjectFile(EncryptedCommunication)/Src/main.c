@@ -81,7 +81,7 @@ static void MX_I2C1_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-void generate_ringtone_1_array(uint8_t pDest[], uint8_t harmonic){
+void generate_ringtone(uint8_t pDest[], uint8_t harmonic){
 	  //================================= GENERATE SINE WAVES FOR RINGTONE =================================
 	  float offset = ((2.0/3.0)*256)/2.0; // Add first sine wave and 2nd harmonic
 	  float offset_harmonic = ((2.0/3.0)*256)/8.0;
@@ -124,55 +124,10 @@ void generate_ringtone_1_array(uint8_t pDest[], uint8_t harmonic){
 	  }
 }
 
-void play_ringtone_1_array(){
+void play_ringtone(){
 	HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_2, ringtone, 22932, DAC_ALIGN_8B_R);
 }
 
-void generate_ringtone(uint8_t pDest1[], uint8_t pDest2[], uint8_t pDest3[], uint8_t pDest4[]){
-	  //================================= GENERATE SINE WAVES FOR RINGTONE =================================
-	  float offset = ((2.0/3.0)*256)/2.0;
-	  float input;
-	  float step_size;
-
-	  for(int i = 0; i < 4; i++){
-		  input = 0;
-		  step_size = (2.0*PI)/note_1_size;
-		  for(int j = 0; j < note_1_size; j++){
-			  pDest1[j] = offset + arm_sin_f32(input)*offset;
-			  input += step_size;
-		  }
-		  step_size = (2.0*PI)/note_2_size;
-		  for(int j = 0; j < note_2_size; j++){
-			  pDest2[j] = offset + arm_sin_f32(input)*offset;
-			  input += step_size;
-		  }
-		  step_size = (2.0*PI)/note_3_size;
-		  for(int j = 0; j < note_3_size; j++){
-			  pDest3[j] = offset + arm_sin_f32(input)*offset;
-			  input += step_size;
-		  }
-		  step_size = (2.0*PI)/note_4_size;
-		  for(int j = 0; j < note_4_size; j++){
-			  pDest4[j] = offset + arm_sin_f32(input)*offset;
-			  input += step_size;
-		  }
-	  }
-}
-
-void play_ringtone(){
-	HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_2, ringtone_note_1, note_1_size, DAC_ALIGN_8B_R);
-	HAL_Delay(130);
-	HAL_DAC_Stop_DMA(&hdac1, DAC_CHANNEL_2);
-	HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_2, ringtone_note_2, note_2_size, DAC_ALIGN_8B_R);
-	HAL_Delay(130);
-	HAL_DAC_Stop_DMA(&hdac1, DAC_CHANNEL_2);
-	HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_2, ringtone_note_3, note_3_size, DAC_ALIGN_8B_R);
-	HAL_Delay(130);
-	HAL_DAC_Stop_DMA(&hdac1, DAC_CHANNEL_2);
-	HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_2, ringtone_note_4, note_4_size, DAC_ALIGN_8B_R);
-	HAL_Delay(130);
-	HAL_DAC_Stop_DMA(&hdac1, DAC_CHANNEL_2);
-}
 
 /* USER CODE END 0 */
 
@@ -214,11 +169,10 @@ int main(void)
 
   // Testssd1306Driver();
   // generate_ringtone(ringtone_note_1, ringtone_note_2, ringtone_note_3, ringtone_note_4);
-  generate_ringtone_1_array(ringtone, 1);
-
+  generate_ringtone(ringtone, 1);
   HAL_TIM_Base_Start_IT(&htim2);
   // play_ringtone();
-  play_ringtone_1_array();
+  play_ringtone();
 
   /* USER CODE END 2 */
 
