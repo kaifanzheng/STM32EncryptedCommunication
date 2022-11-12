@@ -38,6 +38,7 @@
 #define note_2_size 36
 #define note_3_size 38
 #define note_4_size 34
+#define time_between_note 130
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -61,6 +62,8 @@ uint8_t ringtone_note_1[note_1_size];
 uint8_t ringtone_note_2[note_2_size];
 uint8_t ringtone_note_3[note_3_size];
 uint8_t ringtone_note_4[note_4_size];
+
+uint8_t ringtone[22932]; // All notes in one array, DMA can be performed in one go
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -78,6 +81,53 @@ static void MX_I2C1_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+void generate_ringtone_1_array(uint8_t pDest[], uint8_t harmonic){
+	  //================================= GENERATE SINE WAVES FOR RINGTONE =================================
+	  float offset = ((2.0/3.0)*256)/2.0; // Add first sine wave and 2nd harmonic
+	  float offset_harmonic = ((2.0/3.0)*256)/8.0;
+	  int note_sample_length = 22932/4;  // = 5733
+	  float input = 0;
+	  float step_size;
+	  float input_harmonic_1 = 0;
+	  float step_size_harmonic_1;
+	  float input_harmonic_2 = 0;
+	  float step_size_harmonic_2;
+	  // Fill array with values:
+	  for(int i = 0; i < 22932; i++){
+		  if(i == 0){
+			  input = 0;
+			  step_size = (2.0*PI)/note_1_size;
+			  step_size_harmonic_1 = (2.0*PI)/(note_1_size * 2);
+			  step_size_harmonic_2 = (2.0*PI)/(note_1_size * 4);
+		  } else if(i == note_sample_length){
+			  input = 0;
+			  step_size = (2.0*PI)/note_2_size;
+			  step_size_harmonic_1 = (2.0*PI)/(note_2_size * 2);
+			  step_size_harmonic_2 = (2.0*PI)/(note_2_size * 4);
+		  } else if(i == note_sample_length * 2){
+			  input = 0;
+			  step_size = (2.0*PI)/note_3_size;
+			  step_size_harmonic_1 = (2.0*PI)/(note_3_size * 2);
+			  step_size_harmonic_2 = (2.0*PI)/(note_3_size * 4);
+		  } else if(i == note_sample_length * 3){
+			  input = 0;
+			  step_size = (2.0*PI)/note_4_size;
+			  step_size_harmonic_1 = (2.0*PI)/(note_4_size * 2);
+			  step_size_harmonic_2 = (2.0*PI)/(note_4_size * 4);
+		  }
+		  pDest[i] = offset + arm_sin_f32(input)*offset;
+		  if(harmonic) pDest[i] += offset_harmonic + arm_sin_f32(input_harmonic_1)*offset_harmonic;
+		  // pDest[i] += offset_harmonic + arm_sin_f32(input_harmonic_2)*offset_harmonic;
+		  input += step_size;
+		  input_harmonic_1 += step_size_harmonic_1;
+		  input_harmonic_2 += step_size_harmonic_2;
+	  }
+}
+
+void play_ringtone_1_array(){
+	HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_2, ringtone, 22932, DAC_ALIGN_8B_R);
+}
+
 void generate_ringtone(uint8_t pDest1[], uint8_t pDest2[], uint8_t pDest3[], uint8_t pDest4[]){
 	  //================================= GENERATE SINE WAVES FOR RINGTONE =================================
 	  float offset = ((2.0/3.0)*256)/2.0;
@@ -110,18 +160,17 @@ void generate_ringtone(uint8_t pDest1[], uint8_t pDest2[], uint8_t pDest3[], uin
 }
 
 void play_ringtone(){
-	uint8_t time_between_note = 130;
 	HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_2, ringtone_note_1, note_1_size, DAC_ALIGN_8B_R);
-	HAL_Delay(time_between_note);
+	HAL_Delay(130);
 	HAL_DAC_Stop_DMA(&hdac1, DAC_CHANNEL_2);
 	HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_2, ringtone_note_2, note_2_size, DAC_ALIGN_8B_R);
-	HAL_Delay(time_between_note);
+	HAL_Delay(130);
 	HAL_DAC_Stop_DMA(&hdac1, DAC_CHANNEL_2);
 	HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_2, ringtone_note_3, note_3_size, DAC_ALIGN_8B_R);
-	HAL_Delay(time_between_note);
+	HAL_Delay(130);
 	HAL_DAC_Stop_DMA(&hdac1, DAC_CHANNEL_2);
 	HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_2, ringtone_note_4, note_4_size, DAC_ALIGN_8B_R);
-	HAL_Delay(time_between_note);
+	HAL_Delay(130);
 	HAL_DAC_Stop_DMA(&hdac1, DAC_CHANNEL_2);
 }
 
@@ -163,11 +212,13 @@ int main(void)
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
 
-  //Testssd1306Driver();
-  generate_ringtone(ringtone_note_1, ringtone_note_2, ringtone_note_3, ringtone_note_4);
+  // Testssd1306Driver();
+  // generate_ringtone(ringtone_note_1, ringtone_note_2, ringtone_note_3, ringtone_note_4);
+  generate_ringtone_1_array(ringtone, 1);
 
   HAL_TIM_Base_Start_IT(&htim2);
-  play_ringtone();
+  // play_ringtone();
+  play_ringtone_1_array();
 
   /* USER CODE END 2 */
 
