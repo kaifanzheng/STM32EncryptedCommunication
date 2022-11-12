@@ -12,3 +12,7 @@
 *.sym
 *.elf
 *.hex
+*.su
+*.map
+*.su
+ProjectFile(EncryptedCommunication)/.settings/language.settings.xml

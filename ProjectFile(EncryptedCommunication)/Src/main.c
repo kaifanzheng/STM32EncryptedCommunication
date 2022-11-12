@@ -23,7 +23,8 @@
 /* USER CODE BEGIN Includes */
 #include <testFunctionalities.h>
 #include "OLEDScreenDriver.h"
-
+#define ARM_MATH_CM4
+#include "arm_math.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -33,6 +34,11 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define note_1_size 32
+#define note_2_size 36
+#define note_3_size 38
+#define note_4_size 34
+#define time_between_note 130
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -52,7 +58,12 @@ TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim3;
 
 /* USER CODE BEGIN PV */
+uint8_t ringtone_note_1[note_1_size];
+uint8_t ringtone_note_2[note_2_size];
+uint8_t ringtone_note_3[note_3_size];
+uint8_t ringtone_note_4[note_4_size];
 
+uint8_t ringtone[22932]; // All notes in one array, DMA can be performed in one go
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -70,6 +81,53 @@ static void MX_I2C1_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+void generate_ringtone(uint8_t pDest[], uint8_t harmonic){
+	  //================================= GENERATE SINE WAVES FOR RINGTONE =================================
+	  float offset = ((2.0/3.0)*256)/2.0; // Add first sine wave and 2nd harmonic
+	  float offset_harmonic = ((2.0/3.0)*256)/8.0;
+	  int note_sample_length = 22932/4;  // = 5733
+	  float input = 0;
+	  float step_size;
+	  float input_harmonic_1 = 0;
+	  float step_size_harmonic_1;
+	  float input_harmonic_2 = 0;
+	  float step_size_harmonic_2;
+	  // Fill array with values:
+	  for(int i = 0; i < 22932; i++){
+		  if(i == 0){
+			  input = 0;
+			  step_size = (2.0*PI)/note_1_size;
+			  step_size_harmonic_1 = (2.0*PI)/(note_1_size * 2);
+			  step_size_harmonic_2 = (2.0*PI)/(note_1_size * 4);
+		  } else if(i == note_sample_length){
+			  input = 0;
+			  step_size = (2.0*PI)/note_2_size;
+			  step_size_harmonic_1 = (2.0*PI)/(note_2_size * 2);
+			  step_size_harmonic_2 = (2.0*PI)/(note_2_size * 4);
+		  } else if(i == note_sample_length * 2){
+			  input = 0;
+			  step_size = (2.0*PI)/note_3_size;
+			  step_size_harmonic_1 = (2.0*PI)/(note_3_size * 2);
+			  step_size_harmonic_2 = (2.0*PI)/(note_3_size * 4);
+		  } else if(i == note_sample_length * 3){
+			  input = 0;
+			  step_size = (2.0*PI)/note_4_size;
+			  step_size_harmonic_1 = (2.0*PI)/(note_4_size * 2);
+			  step_size_harmonic_2 = (2.0*PI)/(note_4_size * 4);
+		  }
+		  pDest[i] = offset + arm_sin_f32(input)*offset;
+		  if(harmonic) pDest[i] += offset_harmonic + arm_sin_f32(input_harmonic_1)*offset_harmonic;
+		  // pDest[i] += offset_harmonic + arm_sin_f32(input_harmonic_2)*offset_harmonic;
+		  input += step_size;
+		  input_harmonic_1 += step_size_harmonic_1;
+		  input_harmonic_2 += step_size_harmonic_2;
+	  }
+}
+
+void play_ringtone(){
+	HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_2, ringtone, 22932, DAC_ALIGN_8B_R);
+}
+
 
 /* USER CODE END 0 */
 
@@ -109,7 +167,12 @@ int main(void)
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
 
-  //Testssd1306Driver();
+  // Testssd1306Driver();
+  // generate_ringtone(ringtone_note_1, ringtone_note_2, ringtone_note_3, ringtone_note_4);
+  generate_ringtone(ringtone, 1);
+  HAL_TIM_Base_Start_IT(&htim2);
+  // play_ringtone();
+  play_ringtone();
 
   /* USER CODE END 2 */
 
@@ -118,7 +181,7 @@ int main(void)
   while (1)
   {
 	  //testKeypadDriver();
-	  testOLEDScreenDriverPrint();
+	  //testOLEDScreenDriverPrint();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
