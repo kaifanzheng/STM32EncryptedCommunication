@@ -165,6 +165,10 @@ char detectKey(uint16_t GPIO_Pin){
 }
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
+	// Interrupt handler for Button functionality
+	if(GPIO_Pin == Button_Pin){
+		play_ringtone();
+	}
 	if(keypadActive  != 0){
 		char result = detectKey(GPIO_Pin);
 		keyPadResult = &result;
