@@ -34,7 +34,7 @@ Src/main.o: ../Src/main.c ../Inc/main.h \
  ../Inc/testFunctionalities.h ../Inc/fonts.h ../Inc/main.h \
  ../Inc/ssd1306.h ../Inc/keypadDriver.h ../Inc/OLEDScreenDriver.h \
  ../Inc/OLEDScreenDriver.h ../Inc/arm_math.h \
- ../Drivers/CMSIS/Include/cmsis_compiler.h
+ ../Drivers/CMSIS/Include/cmsis_compiler.h ../Inc/keypadDriver.h
 ../Inc/main.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal.h:
 ../Inc/stm32l4xx_hal_conf.h:
@@ -77,3 +77,4 @@ Src/main.o: ../Src/main.c ../Inc/main.h \
 ../Inc/OLEDScreenDriver.h:
 ../Inc/arm_math.h:
 ../Drivers/CMSIS/Include/cmsis_compiler.h:
+../Inc/keypadDriver.h:
