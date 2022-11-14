@@ -1,0 +1,3 @@
+../Src/cryptosystem.c:18:5:isCoprime	24	static
+../Src/cryptosystem.c:27:5:isPrime	24	static
+../Src/cryptosystem.c:36:5:Inite	16	static

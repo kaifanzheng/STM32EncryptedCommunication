@@ -7,11 +7,12 @@
 
 #ifndef INC_CRYPTOSYSTEM_H_
 #define INC_CRYPTOSYSTEM_H_
+#include "main.h"
 
-typedef struct _PublicMessege{
-	int publicMod;
-	int publicPower;
-}PublicMessege;
+//typedef struct _PublicMessege{
+//	int publicMod;
+//	int publicPower;
+//}PublicMessege;
 
 
 //return false if it's not coprime

@@ -2968,6 +2968,120 @@ Discarded input sections
  .debug_macro   0x0000000000000000      0xa91 ./Src/OLEDScreenDriver.o
  .debug_macro   0x0000000000000000      0x196 ./Src/OLEDScreenDriver.o
  .debug_macro   0x0000000000000000      0x432 ./Src/OLEDScreenDriver.o
+ .group         0x0000000000000000        0xc ./Src/cryptosystem.o
+ .group         0x0000000000000000        0xc ./Src/cryptosystem.o
+ .group         0x0000000000000000        0xc ./Src/cryptosystem.o
+ .group         0x0000000000000000        0xc ./Src/cryptosystem.o
+ .group         0x0000000000000000        0xc ./Src/cryptosystem.o
+ .group         0x0000000000000000        0xc ./Src/cryptosystem.o
+ .group         0x0000000000000000        0xc ./Src/cryptosystem.o
+ .group         0x0000000000000000        0xc ./Src/cryptosystem.o
+ .group         0x0000000000000000        0xc ./Src/cryptosystem.o
+ .group         0x0000000000000000        0xc ./Src/cryptosystem.o
+ .group         0x0000000000000000        0xc ./Src/cryptosystem.o
+ .group         0x0000000000000000        0xc ./Src/cryptosystem.o
+ .group         0x0000000000000000        0xc ./Src/cryptosystem.o
+ .group         0x0000000000000000        0xc ./Src/cryptosystem.o
+ .group         0x0000000000000000        0xc ./Src/cryptosystem.o
+ .group         0x0000000000000000        0xc ./Src/cryptosystem.o
+ .group         0x0000000000000000        0xc ./Src/cryptosystem.o
+ .group         0x0000000000000000        0xc ./Src/cryptosystem.o
+ .group         0x0000000000000000        0xc ./Src/cryptosystem.o
+ .group         0x0000000000000000        0xc ./Src/cryptosystem.o
+ .group         0x0000000000000000        0xc ./Src/cryptosystem.o
+ .group         0x0000000000000000        0xc ./Src/cryptosystem.o
+ .group         0x0000000000000000        0xc ./Src/cryptosystem.o
+ .group         0x0000000000000000        0xc ./Src/cryptosystem.o
+ .group         0x0000000000000000        0xc ./Src/cryptosystem.o
+ .group         0x0000000000000000        0xc ./Src/cryptosystem.o
+ .group         0x0000000000000000        0xc ./Src/cryptosystem.o
+ .group         0x0000000000000000        0xc ./Src/cryptosystem.o
+ .group         0x0000000000000000        0xc ./Src/cryptosystem.o
+ .group         0x0000000000000000        0xc ./Src/cryptosystem.o
+ .group         0x0000000000000000        0xc ./Src/cryptosystem.o
+ .group         0x0000000000000000        0xc ./Src/cryptosystem.o
+ .group         0x0000000000000000        0xc ./Src/cryptosystem.o
+ .group         0x0000000000000000        0xc ./Src/cryptosystem.o
+ .group         0x0000000000000000        0xc ./Src/cryptosystem.o
+ .group         0x0000000000000000        0xc ./Src/cryptosystem.o
+ .group         0x0000000000000000        0xc ./Src/cryptosystem.o
+ .group         0x0000000000000000        0xc ./Src/cryptosystem.o
+ .group         0x0000000000000000        0xc ./Src/cryptosystem.o
+ .group         0x0000000000000000        0xc ./Src/cryptosystem.o
+ .group         0x0000000000000000        0xc ./Src/cryptosystem.o
+ .group         0x0000000000000000        0xc ./Src/cryptosystem.o
+ .group         0x0000000000000000        0xc ./Src/cryptosystem.o
+ .group         0x0000000000000000        0xc ./Src/cryptosystem.o
+ .text          0x0000000000000000        0x0 ./Src/cryptosystem.o
+ .data          0x0000000000000000        0x0 ./Src/cryptosystem.o
+ .bss           0x0000000000000000        0x0 ./Src/cryptosystem.o
+ .bss.p         0x0000000000000000        0x4 ./Src/cryptosystem.o
+ .bss.q         0x0000000000000000        0x4 ./Src/cryptosystem.o
+ .bss.phi       0x0000000000000000        0x4 ./Src/cryptosystem.o
+ .bss.e         0x0000000000000000        0x4 ./Src/cryptosystem.o
+ .bss.k         0x0000000000000000        0x4 ./Src/cryptosystem.o
+ .bss.privateKey
+                0x0000000000000000        0x4 ./Src/cryptosystem.o
+ .text.isCoprime
+                0x0000000000000000       0x5a ./Src/cryptosystem.o
+ .text.isPrime  0x0000000000000000       0x42 ./Src/cryptosystem.o
+ .text.Inite    0x0000000000000000       0x44 ./Src/cryptosystem.o
+ .debug_info    0x0000000000000000      0x1b3 ./Src/cryptosystem.o
+ .debug_abbrev  0x0000000000000000       0xf6 ./Src/cryptosystem.o
+ .debug_aranges
+                0x0000000000000000       0x30 ./Src/cryptosystem.o
+ .debug_ranges  0x0000000000000000       0x20 ./Src/cryptosystem.o
+ .debug_macro   0x0000000000000000      0x20a ./Src/cryptosystem.o
+ .debug_macro   0x0000000000000000      0xa78 ./Src/cryptosystem.o
+ .debug_macro   0x0000000000000000      0x1b3 ./Src/cryptosystem.o
+ .debug_macro   0x0000000000000000       0x2e ./Src/cryptosystem.o
+ .debug_macro   0x0000000000000000       0x28 ./Src/cryptosystem.o
+ .debug_macro   0x0000000000000000       0x22 ./Src/cryptosystem.o
+ .debug_macro   0x0000000000000000       0x8e ./Src/cryptosystem.o
+ .debug_macro   0x0000000000000000       0x51 ./Src/cryptosystem.o
+ .debug_macro   0x0000000000000000      0x103 ./Src/cryptosystem.o
+ .debug_macro   0x0000000000000000       0x6a ./Src/cryptosystem.o
+ .debug_macro   0x0000000000000000      0x1df ./Src/cryptosystem.o
+ .debug_macro   0x0000000000000000       0x1c ./Src/cryptosystem.o
+ .debug_macro   0x0000000000000000       0x22 ./Src/cryptosystem.o
+ .debug_macro   0x0000000000000000       0xfb ./Src/cryptosystem.o
+ .debug_macro   0x0000000000000000     0x1011 ./Src/cryptosystem.o
+ .debug_macro   0x0000000000000000      0x11f ./Src/cryptosystem.o
+ .debug_macro   0x0000000000000000    0x1d292 ./Src/cryptosystem.o
+ .debug_macro   0x0000000000000000       0x6d ./Src/cryptosystem.o
+ .debug_macro   0x0000000000000000     0x38ed ./Src/cryptosystem.o
+ .debug_macro   0x0000000000000000      0x174 ./Src/cryptosystem.o
+ .debug_macro   0x0000000000000000       0x5c ./Src/cryptosystem.o
+ .debug_macro   0x0000000000000000     0x1910 ./Src/cryptosystem.o
+ .debug_macro   0x0000000000000000      0x7dc ./Src/cryptosystem.o
+ .debug_macro   0x0000000000000000      0x1b9 ./Src/cryptosystem.o
+ .debug_macro   0x0000000000000000      0x225 ./Src/cryptosystem.o
+ .debug_macro   0x0000000000000000      0x486 ./Src/cryptosystem.o
+ .debug_macro   0x0000000000000000      0x1ce ./Src/cryptosystem.o
+ .debug_macro   0x0000000000000000       0x43 ./Src/cryptosystem.o
+ .debug_macro   0x0000000000000000      0x23d ./Src/cryptosystem.o
+ .debug_macro   0x0000000000000000      0x184 ./Src/cryptosystem.o
+ .debug_macro   0x0000000000000000       0xdf ./Src/cryptosystem.o
+ .debug_macro   0x0000000000000000      0x241 ./Src/cryptosystem.o
+ .debug_macro   0x0000000000000000      0x416 ./Src/cryptosystem.o
+ .debug_macro   0x0000000000000000       0x1c ./Src/cryptosystem.o
+ .debug_macro   0x0000000000000000       0xf2 ./Src/cryptosystem.o
+ .debug_macro   0x0000000000000000      0x22c ./Src/cryptosystem.o
+ .debug_macro   0x0000000000000000       0x61 ./Src/cryptosystem.o
+ .debug_macro   0x0000000000000000       0xa5 ./Src/cryptosystem.o
+ .debug_macro   0x0000000000000000      0x486 ./Src/cryptosystem.o
+ .debug_macro   0x0000000000000000      0x122 ./Src/cryptosystem.o
+ .debug_macro   0x0000000000000000      0x3f6 ./Src/cryptosystem.o
+ .debug_macro   0x0000000000000000      0xa91 ./Src/cryptosystem.o
+ .debug_macro   0x0000000000000000      0x196 ./Src/cryptosystem.o
+ .debug_macro   0x0000000000000000      0x432 ./Src/cryptosystem.o
+ .debug_macro   0x0000000000000000       0x82 ./Src/cryptosystem.o
+ .debug_line    0x0000000000000000      0x7e0 ./Src/cryptosystem.o
+ .debug_str     0x0000000000000000   0x102692 ./Src/cryptosystem.o
+ .comment       0x0000000000000000       0x51 ./Src/cryptosystem.o
+ .debug_frame   0x0000000000000000       0x84 ./Src/cryptosystem.o
+ .ARM.attributes
+                0x0000000000000000       0x34 ./Src/cryptosystem.o
  .group         0x0000000000000000        0xc ./Src/fonts.o
  .group         0x0000000000000000        0xc ./Src/fonts.o
  .group         0x0000000000000000        0xc ./Src/fonts.o
@@ -4207,6 +4321,7 @@ LOAD ./Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.o
 LOAD ./Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_tim.o
 LOAD ./Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_tim_ex.o
 LOAD ./Src/OLEDScreenDriver.o
+LOAD ./Src/cryptosystem.o
 LOAD ./Src/fonts.o
 LOAD ./Src/keypadDriver.o
 LOAD ./Src/main.o
