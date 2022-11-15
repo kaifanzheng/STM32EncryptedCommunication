@@ -41,11 +41,15 @@ extern "C" {
 
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
-
 /* USER CODE END EC */
 
 /* Exported macro ------------------------------------------------------------*/
 /* USER CODE BEGIN EM */
+
+//extern  SPI_HandleTypeDef hspi;
+//void SPI3_IRQHandler(void);
+
+#endif /* __MAIN_H */
 
 /* USER CODE END EM */
 
@@ -70,6 +74,26 @@ void Error_Handler(void);
 #define C4_GPIO_Port GPIOA
 #define R1_Pin GPIO_PIN_0
 #define R1_GPIO_Port GPIOB
+#define C1_Pin GPIO_PIN_2
+#define C1_GPIO_Port GPIOB
+#define LED_Pin GPIO_PIN_14
+#define LED_GPIO_Port GPIOB
+#define C2_Pin GPIO_PIN_15
+#define C2_GPIO_Port GPIOA
+/* USER CODE BEGIN Private defines */
+#define Button_Pin GPIO_PIN_13
+#define Button_GPIO_Port GPIOC
+#define Button_EXTI_IRQn EXTI15_10_IRQn
+#define C3_Pin GPIO_PIN_2
+#define C3_GPIO_Port GPIOA
+#define R2_Pin GPIO_PIN_3
+#define R2_GPIO_Port GPIOA
+#define R4_Pin GPIO_PIN_4
+#define R4_GPIO_Port GPIOA
+#define C4_Pin GPIO_PIN_7
+#define C4_GPIO_Port GPIOA
+#define R1_Pin GPIO_PIN_0
+#define R1_GPIO_Port GPIOB
 #define R3_Pin GPIO_PIN_1
 #define R3_GPIO_Port GPIOB
 #define C1_Pin GPIO_PIN_2
@@ -78,7 +102,6 @@ void Error_Handler(void);
 #define LED_GPIO_Port GPIOB
 #define C2_Pin GPIO_PIN_15
 #define C2_GPIO_Port GPIOA
-/* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
 
@@ -86,4 +109,4 @@ void Error_Handler(void);
 }
 #endif
 
-#endif /* __MAIN_H */
+//#endif /* __MAIN_H */
