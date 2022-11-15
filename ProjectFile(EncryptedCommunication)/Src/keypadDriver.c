@@ -77,7 +77,7 @@ char getOneCharFromKeypad(){
 		}
 		return 'n';
 
-	}else if(row = 1){
+	}else if(row == 1){
 		HAL_GPIO_WritePin(C4_GPIO_Port, C4_Pin, GPIO_PIN_RESET);
 		if(HAL_GPIO_ReadPin(R2_GPIO_Port, R2_Pin) == GPIO_PIN_RESET){
 			cal = 3;
@@ -100,7 +100,7 @@ char getOneCharFromKeypad(){
 		}
 		return 'n';
 
-	}else if(row = 2){
+	}else if(row ==2){
 		HAL_GPIO_WritePin(C4_GPIO_Port, C4_Pin, GPIO_PIN_RESET);
 		if(HAL_GPIO_ReadPin(R3_GPIO_Port, R3_Pin) == GPIO_PIN_RESET){
 			cal = 3;
@@ -123,7 +123,7 @@ char getOneCharFromKeypad(){
 		}
 		return 'n';
 
-	}else if(row = 3){
+	}else if(row == 3){
 		HAL_GPIO_WritePin(C4_GPIO_Port, C4_Pin, GPIO_PIN_RESET);
 		if(HAL_GPIO_ReadPin(R4_GPIO_Port, R4_Pin) == GPIO_PIN_RESET){
 			cal = 3;

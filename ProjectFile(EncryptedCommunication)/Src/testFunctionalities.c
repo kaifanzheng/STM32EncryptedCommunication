@@ -71,13 +71,14 @@ void testOLEDScreenDriverPrint(){
 }
 
 void testKeypadDriver(){
+	InitScreen();
 	while(1){
 		char buf[1];
 		char result = getOneCharFromKeypad();
 		buf[0] = result;
-		InitScreen();
+		//InitScreen();
 		printToScreen(buf);
-		HAL_Delay(5000);
+		HAL_Delay(500);
 		clearScreen();
 	}
 }
