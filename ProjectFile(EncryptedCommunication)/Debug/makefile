@@ -10,7 +10,6 @@ RM := rm -rf
 # All of the sources participating in the build are defined here
 -include sources.mk
 -include Startup/subdir.mk
--include Src/Common/Src/subdir.mk
 -include Src/subdir.mk
 -include Drivers/STM32L4xx_HAL_Driver/Src/subdir.mk
 -include objects.mk
@@ -61,8 +60,8 @@ all: main-build
 main-build: ProjectFile(EncryptedCommunication).elf secondary-outputs
 
 # Tool invocations
-ProjectFile(EncryptedCommunication).elf ProjectFile(EncryptedCommunication).map: $(OBJS) $(USER_OBJS) /Users/sarahajji/git/STM32EncryptedCommunication/ProjectFile(EncryptedCommunication)/STM32L4S5VITX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "ProjectFile(EncryptedCommunication).elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"/Users/sarahajji/git/STM32EncryptedCommunication/ProjectFile(EncryptedCommunication)/STM32L4S5VITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="ProjectFile(EncryptedCommunication).map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+ProjectFile(EncryptedCommunication).elf ProjectFile(EncryptedCommunication).map: $(OBJS) $(USER_OBJS) /Users/niilovuokila/Documents/GitHub/STM32EncryptedCommunication/ProjectFile(EncryptedCommunication)/STM32L4S5VITX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "ProjectFile(EncryptedCommunication).elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"/Users/niilovuokila/Documents/GitHub/STM32EncryptedCommunication/ProjectFile(EncryptedCommunication)/STM32L4S5VITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="ProjectFile(EncryptedCommunication).map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

@@ -164,7 +164,6 @@ char detectKey(uint16_t GPIO_Pin){
 	return ' ';
 }
 
-/*
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 	if(keypadActive  != 0){
 		char result = detectKey(GPIO_Pin);
@@ -172,4 +171,3 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 		HAL_Delay(20);//deBounce
 	}
 }
-*/
