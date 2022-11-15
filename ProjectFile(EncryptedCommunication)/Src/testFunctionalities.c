@@ -82,3 +82,9 @@ void testKeypadDriver(){
 		clearScreen();
 	}
 }
+
+void testCryotoSystem(){
+	IniteCrypto(7,13);
+	uint32_t encodeResult = encode(getPublicMod(),getPublicKey(),4);
+	uint32_t decodeResult = decode(getPublicMod(),getPrivateKey(),encodeResult);
+}

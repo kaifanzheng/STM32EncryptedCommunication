@@ -1,5 +1,5 @@
-Src/main.o: ../Src/main.c ../Inc/main.h \
- ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal.h \
+Src/cryptosystem.o: ../Src/cryptosystem.c ../Inc/cryptosystem.h \
+ ../Inc/main.h ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal.h \
  ../Inc/stm32l4xx_hal_conf.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_rcc.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_def.h \
@@ -30,12 +30,8 @@ Src/main.o: ../Src/main.c ../Inc/main.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_pwr.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_pwr_ex.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_tim.h \
- ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_tim_ex.h \
- ../Inc/testFunctionalities.h ../Inc/fonts.h ../Inc/main.h \
- ../Inc/ssd1306.h ../Inc/keypadDriver.h ../Inc/OLEDScreenDriver.h \
- ../Inc/OLEDScreenDriver.h ../Inc/arm_math.h \
- ../Drivers/CMSIS/Include/cmsis_compiler.h ../Inc/keypadDriver.h \
- ../Inc/cryptosystem.h
+ ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_tim_ex.h
+../Inc/cryptosystem.h:
 ../Inc/main.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal.h:
 ../Inc/stm32l4xx_hal_conf.h:
@@ -69,14 +65,3 @@ Src/main.o: ../Src/main.c ../Inc/main.h \
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_pwr_ex.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_tim.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_tim_ex.h:
-../Inc/testFunctionalities.h:
-../Inc/fonts.h:
-../Inc/main.h:
-../Inc/ssd1306.h:
-../Inc/keypadDriver.h:
-../Inc/OLEDScreenDriver.h:
-../Inc/OLEDScreenDriver.h:
-../Inc/arm_math.h:
-../Drivers/CMSIS/Include/cmsis_compiler.h:
-../Inc/keypadDriver.h:
-../Inc/cryptosystem.h:

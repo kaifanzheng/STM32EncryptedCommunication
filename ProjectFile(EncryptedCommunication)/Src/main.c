@@ -26,6 +26,7 @@
 #define ARM_MATH_CM4
 #include "arm_math.h"
 #include "keypadDriver.h"
+#include "cryptosystem.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -261,6 +262,23 @@ void enterPageMainPage(){
 	  }
 }
 
+void UILogic(){
+	char keypadInputMain = getOneCharFromKeypad();
+	if(keypadInputMain == '1'){
+		if(mainMenuPage>0){
+			mainMenuPage -= 1;
+			changePageMainPage();
+		}
+	}else if(keypadInputMain == '3'){
+		if(mainMenuPage<4){
+			mainMenuPage += 1;
+			changePageMainPage();
+		}
+	}else if(keypadInputMain == '2'){
+		HAL_Delay(100);
+		enterPageMainPage();
+	}
+}
 
 
 /* USER CODE END 0 */
@@ -307,6 +325,7 @@ int main(void)
   HAL_TIM_Base_Start_IT(&htim2);
   // play_ringtone();
   play_ringtone();
+  //initeScreen and UI
   InitScreen();
   displayMainPageOne();
 
@@ -318,24 +337,9 @@ int main(void)
   {
 	  //testKeypadDriver();
 	  //testOLEDScreenDriverPrint();
+	  //testCryotoSystem();
 	  //take keypad input to flip page
-	  char keypadInputMain = getOneCharFromKeypad();
-	  if(keypadInputMain == '1'){
-		  if(mainMenuPage>0){
-			  mainMenuPage -= 1;
-			  changePageMainPage();
-		  }
-	  }else if(keypadInputMain == '3'){
-		  if(mainMenuPage<4){
-			  mainMenuPage += 1;
-			  changePageMainPage();
-		  }
-	  }else if(keypadInputMain == '2'){
-		  HAL_Delay(100);
-		  enterPageMainPage();
-
-
-	  }
+	  UILogic();
 	  HAL_Delay(50);
 
     /* USER CODE END WHILE */
