@@ -18,8 +18,6 @@ void IniteKeypad(){
 	HAL_GPIO_WritePin(C3_GPIO_Port, C3_Pin, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(C2_GPIO_Port, C2_Pin, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(C1_GPIO_Port, C1_Pin, GPIO_PIN_SET);
-	keypadActive = 0;
-	keyPadResult = NULL;
 
 }
 
@@ -30,148 +28,125 @@ void ClearKeypad(){
 	HAL_GPIO_WritePin(C1_GPIO_Port, C1_Pin, GPIO_PIN_RESET);
 }
 
-//public api function
 char getOneCharFromKeypad(){
+	keyPadResult = NULL;
+	int cal = -1;
+	int row = -1;
 	IniteKeypad();
-	keypadActive = 1;
-	while(keyPadResult == NULL){}
-	keypadActive = 0;
-	ClearKeypad();
-	return *keyPadResult;
-
-}
-
-char detectKey(uint16_t GPIO_Pin){
-	int R = 0;
-	int C = 0;
-	if(GPIO_Pin == R1_Pin){
-		R = 0;
-		HAL_GPIO_WritePin(C4_GPIO_Port, C4_Pin, GPIO_PIN_RESET);
-		if(HAL_GPIO_ReadPin(R1_GPIO_Port, GPIO_Pin) == GPIO_PIN_RESET){
-			HAL_GPIO_WritePin(C4_GPIO_Port, C4_Pin, GPIO_PIN_SET);
-			C = 3;
-			return keyPadLayout[R][C];
+	while(1){
+		int set = HAL_GPIO_ReadPin(R1_GPIO_Port, R1_Pin);
+		if(HAL_GPIO_ReadPin(R1_GPIO_Port, R1_Pin) == GPIO_PIN_SET){
+			row = 0;
+			break;
 		}
-
-		HAL_GPIO_WritePin(C3_GPIO_Port, C3_Pin, GPIO_PIN_RESET);
-		if(HAL_GPIO_ReadPin(R1_GPIO_Port, GPIO_Pin) == GPIO_PIN_RESET){
-			HAL_GPIO_WritePin(C3_GPIO_Port, C3_Pin, GPIO_PIN_SET);
-			C = 2;
-			return keyPadLayout[R][C];
+		if(HAL_GPIO_ReadPin(R2_GPIO_Port, R2_Pin) == GPIO_PIN_SET){
+			row = 1;
+			break;
 		}
-
-		HAL_GPIO_WritePin(C2_GPIO_Port, C2_Pin, GPIO_PIN_RESET);
-		if(HAL_GPIO_ReadPin(R1_GPIO_Port, GPIO_Pin) == GPIO_PIN_RESET){
-			HAL_GPIO_WritePin(C2_GPIO_Port, C2_Pin, GPIO_PIN_SET);
-			C = 1;
-			return keyPadLayout[R][C];
+		if(HAL_GPIO_ReadPin(R3_GPIO_Port, R3_Pin) == GPIO_PIN_SET){
+			row = 2;
+			break;
 		}
-
-		HAL_GPIO_WritePin(C1_GPIO_Port, C1_Pin, GPIO_PIN_RESET);
-		if(HAL_GPIO_ReadPin(R1_GPIO_Port, GPIO_Pin) == GPIO_PIN_RESET){
-			HAL_GPIO_WritePin(C1_GPIO_Port, C1_Pin, GPIO_PIN_SET);
-			C = 0;
-			return keyPadLayout[R][C];
-		}
-	}else if(GPIO_Pin == R2_Pin){
-		R = 1;
-		HAL_GPIO_WritePin(C4_GPIO_Port, C4_Pin, GPIO_PIN_RESET);
-		if(HAL_GPIO_ReadPin(R2_GPIO_Port, GPIO_Pin) == GPIO_PIN_RESET){
-			HAL_GPIO_WritePin(C4_GPIO_Port, C4_Pin, GPIO_PIN_SET);
-			C = 3;
-			return keyPadLayout[R][C];
-		}
-
-		HAL_GPIO_WritePin(C3_GPIO_Port, C3_Pin, GPIO_PIN_RESET);
-		if(HAL_GPIO_ReadPin(R2_GPIO_Port, GPIO_Pin) == GPIO_PIN_RESET){
-			HAL_GPIO_WritePin(C3_GPIO_Port, C3_Pin, GPIO_PIN_SET);
-			C = 2;
-			return keyPadLayout[R][C];
-		}
-
-		HAL_GPIO_WritePin(C2_GPIO_Port, C2_Pin, GPIO_PIN_RESET);
-		if(HAL_GPIO_ReadPin(R2_GPIO_Port, GPIO_Pin) == GPIO_PIN_RESET){
-			HAL_GPIO_WritePin(C2_GPIO_Port, C2_Pin, GPIO_PIN_SET);
-			C = 1;
-			return keyPadLayout[R][C];
-		}
-
-		HAL_GPIO_WritePin(C1_GPIO_Port, C1_Pin, GPIO_PIN_RESET);
-		if(HAL_GPIO_ReadPin(R2_GPIO_Port, GPIO_Pin) == GPIO_PIN_RESET){
-			HAL_GPIO_WritePin(C1_GPIO_Port, C1_Pin, GPIO_PIN_SET);
-			C = 0;
-			return keyPadLayout[R][C];
-		}
-	}else if(GPIO_Pin == R3_Pin){
-		R = 2;
-		HAL_GPIO_WritePin(C4_GPIO_Port, C4_Pin, GPIO_PIN_RESET);
-		if(HAL_GPIO_ReadPin(R3_GPIO_Port, GPIO_Pin) == GPIO_PIN_RESET){
-			HAL_GPIO_WritePin(C4_GPIO_Port, C4_Pin, GPIO_PIN_SET);
-			C = 3;
-			return keyPadLayout[R][C];
-		}
-
-		HAL_GPIO_WritePin(C3_GPIO_Port, C3_Pin, GPIO_PIN_RESET);
-		if(HAL_GPIO_ReadPin(R3_GPIO_Port, GPIO_Pin) == GPIO_PIN_RESET){
-			HAL_GPIO_WritePin(C3_GPIO_Port, C3_Pin, GPIO_PIN_SET);
-			C = 2;
-			return keyPadLayout[R][C];
-		}
-
-		HAL_GPIO_WritePin(C2_GPIO_Port, C2_Pin, GPIO_PIN_RESET);
-		if(HAL_GPIO_ReadPin(R3_GPIO_Port, GPIO_Pin) == GPIO_PIN_RESET){
-			HAL_GPIO_WritePin(C2_GPIO_Port, C2_Pin, GPIO_PIN_SET);
-			C = 1;
-			return keyPadLayout[R][C];
-		}
-
-		HAL_GPIO_WritePin(C1_GPIO_Port, C1_Pin, GPIO_PIN_RESET);
-		if(HAL_GPIO_ReadPin(R3_GPIO_Port, GPIO_Pin) == GPIO_PIN_RESET){
-			HAL_GPIO_WritePin(C1_GPIO_Port, C1_Pin, GPIO_PIN_SET);
-			C = 0;
-			return keyPadLayout[R][C];
-		}
-	}else if(GPIO_Pin == R4_Pin){
-		R = 3;
-		HAL_GPIO_WritePin(C4_GPIO_Port, C4_Pin, GPIO_PIN_RESET);
-		if(HAL_GPIO_ReadPin(R4_GPIO_Port, GPIO_Pin) == GPIO_PIN_RESET){
-			HAL_GPIO_WritePin(C4_GPIO_Port, C4_Pin, GPIO_PIN_SET);
-			C = 3;
-			return keyPadLayout[R][C];
-		}
-
-		HAL_GPIO_WritePin(C3_GPIO_Port, C3_Pin, GPIO_PIN_RESET);
-		if(HAL_GPIO_ReadPin(R4_GPIO_Port, GPIO_Pin) == GPIO_PIN_RESET){
-			HAL_GPIO_WritePin(C3_GPIO_Port, C3_Pin, GPIO_PIN_SET);
-			C = 2;
-			return keyPadLayout[R][C];
-		}
-
-		HAL_GPIO_WritePin(C2_GPIO_Port, C2_Pin, GPIO_PIN_RESET);
-		if(HAL_GPIO_ReadPin(R4_GPIO_Port, GPIO_Pin) == GPIO_PIN_RESET){
-			HAL_GPIO_WritePin(C2_GPIO_Port, C2_Pin, GPIO_PIN_SET);
-			C = 1;
-			return keyPadLayout[R][C];
-		}
-
-		HAL_GPIO_WritePin(C1_GPIO_Port, C1_Pin, GPIO_PIN_RESET);
-		if(HAL_GPIO_ReadPin(R4_GPIO_Port, GPIO_Pin) == GPIO_PIN_RESET){
-			HAL_GPIO_WritePin(C1_GPIO_Port, C1_Pin, GPIO_PIN_SET);
-			C = 0;
-			return keyPadLayout[R][C];
+		if(HAL_GPIO_ReadPin(R4_GPIO_Port, R4_Pin) == GPIO_PIN_SET){
+			row = 3;
+			break;
 		}
 	}
-	return ' ';
-}
 
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
-	// Interrupt handler for Button functionality
-	if(GPIO_Pin == Button_Pin){
-		play_ringtone();
+
+	if(row == 0){
+		HAL_GPIO_WritePin(C4_GPIO_Port, C4_Pin, GPIO_PIN_RESET);
+		if(HAL_GPIO_ReadPin(R1_GPIO_Port, R1_Pin) == GPIO_PIN_RESET){
+			cal = 3;
+			return keyPadLayout[row][cal];
+		}
+		HAL_GPIO_WritePin(C3_GPIO_Port, C3_Pin, GPIO_PIN_RESET);
+		if(HAL_GPIO_ReadPin(R1_GPIO_Port, R1_Pin) == GPIO_PIN_RESET){
+			cal = 2;
+			return keyPadLayout[row][cal];
+		}
+		HAL_GPIO_WritePin(C2_GPIO_Port, C2_Pin, GPIO_PIN_RESET);
+		if(HAL_GPIO_ReadPin(R1_GPIO_Port, R1_Pin) == GPIO_PIN_RESET){
+			cal = 1;
+			return keyPadLayout[row][cal];
+		}
+		HAL_GPIO_WritePin(C1_GPIO_Port, C1_Pin, GPIO_PIN_RESET);
+		if(HAL_GPIO_ReadPin(R1_GPIO_Port, R1_Pin) == GPIO_PIN_RESET){
+			cal = 0;
+			return keyPadLayout[row][cal];
+		}
+		return 'n';
+
+	}else if(row = 1){
+		HAL_GPIO_WritePin(C4_GPIO_Port, C4_Pin, GPIO_PIN_RESET);
+		if(HAL_GPIO_ReadPin(R2_GPIO_Port, R2_Pin) == GPIO_PIN_RESET){
+			cal = 3;
+			return keyPadLayout[row][cal];
+		}
+		HAL_GPIO_WritePin(C3_GPIO_Port, C3_Pin, GPIO_PIN_RESET);
+		if(HAL_GPIO_ReadPin(R2_GPIO_Port, R2_Pin) == GPIO_PIN_RESET){
+			cal = 2;
+			return keyPadLayout[row][cal];
+		}
+		HAL_GPIO_WritePin(C2_GPIO_Port, C2_Pin, GPIO_PIN_RESET);
+		if(HAL_GPIO_ReadPin(R2_GPIO_Port, R2_Pin) == GPIO_PIN_RESET){
+			cal = 1;
+			return keyPadLayout[row][cal];
+		}
+		HAL_GPIO_WritePin(C1_GPIO_Port, C1_Pin, GPIO_PIN_RESET);
+		if(HAL_GPIO_ReadPin(R2_GPIO_Port, R2_Pin) == GPIO_PIN_RESET){
+			cal = 0;
+			return keyPadLayout[row][cal];
+		}
+		return 'n';
+
+	}else if(row = 2){
+		HAL_GPIO_WritePin(C4_GPIO_Port, C4_Pin, GPIO_PIN_RESET);
+		if(HAL_GPIO_ReadPin(R3_GPIO_Port, R3_Pin) == GPIO_PIN_RESET){
+			cal = 3;
+			return keyPadLayout[row][cal];
+		}
+		HAL_GPIO_WritePin(C3_GPIO_Port, C3_Pin, GPIO_PIN_RESET);
+		if(HAL_GPIO_ReadPin(R3_GPIO_Port, R3_Pin) == GPIO_PIN_RESET){
+			cal = 2;
+			return keyPadLayout[row][cal];
+		}
+		HAL_GPIO_WritePin(C2_GPIO_Port, C2_Pin, GPIO_PIN_RESET);
+		if(HAL_GPIO_ReadPin(R3_GPIO_Port, R3_Pin) == GPIO_PIN_RESET){
+			cal = 1;
+			return keyPadLayout[row][cal];
+		}
+		HAL_GPIO_WritePin(C1_GPIO_Port, C1_Pin, GPIO_PIN_RESET);
+		if(HAL_GPIO_ReadPin(R3_GPIO_Port, R3_Pin) == GPIO_PIN_RESET){
+			cal = 0;
+			return keyPadLayout[row][cal];
+		}
+		return 'n';
+
+	}else if(row = 3){
+		HAL_GPIO_WritePin(C4_GPIO_Port, C4_Pin, GPIO_PIN_RESET);
+		if(HAL_GPIO_ReadPin(R4_GPIO_Port, R4_Pin) == GPIO_PIN_RESET){
+			cal = 3;
+			return keyPadLayout[row][cal];
+		}
+		HAL_GPIO_WritePin(C3_GPIO_Port, C3_Pin, GPIO_PIN_RESET);
+		if(HAL_GPIO_ReadPin(R4_GPIO_Port, R4_Pin) == GPIO_PIN_RESET){
+			cal = 2;
+			return keyPadLayout[row][cal];
+		}
+		HAL_GPIO_WritePin(C2_GPIO_Port, C2_Pin, GPIO_PIN_RESET);
+		if(HAL_GPIO_ReadPin(R4_GPIO_Port, R4_Pin) == GPIO_PIN_RESET){
+			cal = 1;
+			return keyPadLayout[row][cal];
+		}
+		HAL_GPIO_WritePin(C1_GPIO_Port, C1_Pin, GPIO_PIN_RESET);
+		if(HAL_GPIO_ReadPin(R4_GPIO_Port, R4_Pin) == GPIO_PIN_RESET){
+			cal = 0;
+			return keyPadLayout[row][cal];
+		}
+		return 'n';
 	}
-	if(keypadActive  != 0){
-		char result = detectKey(GPIO_Pin);
-		keyPadResult = &result;
-		HAL_Delay(20);//deBounce
-	}
+
+
+
 }

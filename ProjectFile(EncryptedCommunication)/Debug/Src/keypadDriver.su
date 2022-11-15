@@ -1,5 +1,3 @@
 ../Src/keypadDriver.c:16:6:IniteKeypad	8	static
-../Src/keypadDriver.c:26:6:ClearKeypad	8	static
-../Src/keypadDriver.c:34:6:getOneCharFromKeypad	8	static
-../Src/keypadDriver.c:44:6:detectKey	24	static
-../Src/keypadDriver.c:167:6:HAL_GPIO_EXTI_Callback	24	static
+../Src/keypadDriver.c:24:6:ClearKeypad	8	static
+../Src/keypadDriver.c:31:6:getOneCharFromKeypad	24	static
