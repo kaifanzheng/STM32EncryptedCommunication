@@ -65,6 +65,9 @@ uint8_t ringtone_note_3[note_3_size];
 uint8_t ringtone_note_4[note_4_size];
 
 uint8_t ringtone[22932]; // All notes in one array, DMA can be performed in one go
+
+uint8_t mainMenuPage = 0;
+const uint8_t maxMenuPageNum = 5;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -128,6 +131,136 @@ void generate_ringtone(uint8_t pDest[], uint8_t harmonic){
 void play_ringtone(){
 	HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_2, ringtone, 22932, DAC_ALIGN_8B_R);
 }
+//ui start###################################################################
+void displayMainPageOne(){
+	printToScreen("main menu");
+	printToScreen(" ");
+	printToScreen(" ");
+	printToScreen("   Wi-Fi option  >");
+}
+
+void displayMainPageTwo(){
+	printToScreen("main menu");
+	printToScreen(" ");
+	printToScreen(" ");
+	printToScreen("<  send message >");
+}
+
+void displayMainPageThree(){
+	printToScreen("main menu");
+	printToScreen(" ");
+	printToScreen(" ");
+	printToScreen("< receive message>");
+}
+
+void displayMainPageFour(){
+	printToScreen("main menu");
+	printToScreen(" ");
+	printToScreen(" ");
+	printToScreen("<  test speaker  >");
+}
+
+void displayMainPageFive(){
+	printToScreen("main menu");
+	printToScreen(" ");
+	printToScreen(" ");
+	printToScreen("<show temperature ");
+}
+
+void changePageMainPage(){
+	  clearScreen();
+	  if(mainMenuPage == 0){
+		  displayMainPageOne();
+	  }else if(mainMenuPage == 1){
+		  displayMainPageTwo();
+	  }else if(mainMenuPage == 2){
+		  displayMainPageThree();
+	  }else if(mainMenuPage == 3){
+		  displayMainPageFour();
+	  }else if(mainMenuPage == 4){
+		  displayMainPageFive();
+	  }
+}
+
+void ExitToMain(){
+	mainMenuPage = 0;
+	clearScreen();
+	displayMainPageOne();
+}
+void wifiOptionPage(){
+	printToScreen("Wi-Fi option");
+	while(1){
+		if(getOneCharFromKeypad() == '2'){
+			ExitToMain();
+			break;
+		}
+		HAL_Delay(20);
+		//TODO
+	}
+}
+void sendMessagePage(){
+	printToScreen("send Message");
+	while(1){
+		if(getOneCharFromKeypad() == '2'){
+			ExitToMain();
+			break;
+		}
+		HAL_Delay(20);
+		//TODO
+	}
+}
+void getMessagePage(){
+	printToScreen("get Message");
+	while(1){
+		if(getOneCharFromKeypad() == '2'){
+			ExitToMain();
+			break;
+
+		}
+		HAL_Delay(20);
+		//TODO
+	}
+}
+void testSpeakerPage(){
+	printToScreen("testing speaker");
+	printToScreen(" ");
+	printToScreen("press 2 exit");
+	while(1){
+		if(getOneCharFromKeypad() == '2'){
+			ExitToMain();
+			break;
+		}
+		play_ringtone();
+		HAL_Delay(20);
+	}
+}
+void getTemperaturePage(){
+	printToScreen("temperature is:");
+	while(1){
+		if(getOneCharFromKeypad() == '2'){
+			ExitToMain();
+			break;
+		}
+		HAL_Delay(20);
+		//TODO
+	}
+}
+
+void enterPageMainPage(){
+	  clearScreen();
+	  if(mainMenuPage == 0){
+		  wifiOptionPage();
+	  }else if(mainMenuPage == 1){
+		  sendMessagePage();
+	  }else if(mainMenuPage == 2){
+		  getMessagePage();
+	  }else if(mainMenuPage == 3){
+		  testSpeakerPage();
+	  }else if(mainMenuPage == 4){
+		  getTemperaturePage();
+	  }
+}
+
 
 
 /* USER CODE END 0 */
@@ -174,6 +307,8 @@ int main(void)
   HAL_TIM_Base_Start_IT(&htim2);
   // play_ringtone();
   play_ringtone();
+  InitScreen();
+  displayMainPageOne();
 
   /* USER CODE END 2 */
 
@@ -181,8 +316,28 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  testKeypadDriver();
+	  //testKeypadDriver();
 	  //testOLEDScreenDriverPrint();
+	  //take keypad input to flip page
+	  char keypadInputMain = getOneCharFromKeypad();
+	  if(keypadInputMain == '1'){
+		  if(mainMenuPage>0){
+			  mainMenuPage -= 1;
+			  changePageMainPage();
+		  }
+	  }else if(keypadInputMain == '3'){
+		  if(mainMenuPage<4){
+			  mainMenuPage += 1;
+			  changePageMainPage();
+		  }
+	  }else if(keypadInputMain == '2'){
+		  HAL_Delay(100);
+		  enterPageMainPage();
+
+
+	  }
+	  HAL_Delay(50);
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

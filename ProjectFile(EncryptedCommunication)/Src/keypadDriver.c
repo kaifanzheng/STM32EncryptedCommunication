@@ -33,25 +33,25 @@ char getOneCharFromKeypad(){
 	int cal = -1;
 	int row = -1;
 	IniteKeypad();
-	while(1){
+	//while(1){
 		int set = HAL_GPIO_ReadPin(R1_GPIO_Port, R1_Pin);
 		if(HAL_GPIO_ReadPin(R1_GPIO_Port, R1_Pin) == GPIO_PIN_SET){
 			row = 0;
-			break;
+			//break;
 		}
 		if(HAL_GPIO_ReadPin(R2_GPIO_Port, R2_Pin) == GPIO_PIN_SET){
 			row = 1;
-			break;
+			//break;
 		}
 		if(HAL_GPIO_ReadPin(R3_GPIO_Port, R3_Pin) == GPIO_PIN_SET){
 			row = 2;
-			break;
+			//break;
 		}
 		if(HAL_GPIO_ReadPin(R4_GPIO_Port, R4_Pin) == GPIO_PIN_SET){
 			row = 3;
-			break;
+			//break;
 		}
-	}
+	//}
 
 
 	if(row == 0){
@@ -144,6 +144,8 @@ char getOneCharFromKeypad(){
 			cal = 0;
 			return keyPadLayout[row][cal];
 		}
+		return 'n';
+	}else{
 		return 'n';
 	}
 

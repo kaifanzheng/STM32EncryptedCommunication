@@ -14,6 +14,8 @@ void printToScreen(char *buffer);
 
 void clearScreen();
 
+void InitScreen();
+
 
 
 #endif /* INC_OLEDSCREENDRIVER_H_ */
