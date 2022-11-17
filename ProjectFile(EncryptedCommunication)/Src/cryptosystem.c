@@ -32,6 +32,17 @@ int isPrime(uint32_t a){
 	return 1;
 }
 
+uint32_t emod(uint32_t a, uint32_t  b, uint32_t  c){
+    if(b == 0){
+        return 1;
+    }else if(b%2 == 0){
+    	uint32_t  d = emod(a,b/2,c);
+        return (d*d)%c;
+    }else{
+        return ((a%c)*emod(a,b-1,c))%c;
+    }
+}
+
 uint8_t IniteCrypto(uint32_t userInputP, uint32_t userInputQ){
 	if(isPrime(userInputP) == 0 || isPrime(userInputQ) == 0){
 		return 0;//cannot inite
@@ -59,23 +70,17 @@ uint8_t IniteCrypto(uint32_t userInputP, uint32_t userInputQ){
 	}
 
 	privateKey = ((findK*phiN)+1)/e;
+	return 1;
 }
 
-uint32_t power(uint32_t base,uint32_t po){
-	uint32_t result = 1;
-	for(uint32_t i =0;i<po;i++){
-		result = result*base;
-	}
-	return result;
-}
 
 uint32_t encode(uint32_t publicMode,uint32_t publicPower, uint32_t num){
-	uint32_t result=  power(num,publicPower)%publicMode;
+	uint32_t result=  emod(num,publicPower,publicMode);
 	return result;
 }
 
 uint32_t decode(uint32_t publicMode,uint32_t privatePower, uint32_t num){
-	uint32_t result =  power(num,privatePower)%publicMode;
+	uint32_t result =  emod(num,privatePower,publicMode);
 	return result;
 }
 
