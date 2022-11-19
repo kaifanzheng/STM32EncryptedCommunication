@@ -144,6 +144,11 @@ void clearBufferString(uint8_t *buffer, uint8_t bufferSize){
 		buffer[i] = 0;
 	}
 }
+void hardcopy_char(uint8_t *buffer, uint8_t bufferSize, uint8_t *bufferCopy){
+	for(uint8_t i =0;i<bufferSize;i++){
+		bufferCopy[i] = buffer[i];
+	}
+}
 void displayMainPageOne(){
 	printToScreen("main menu");
 	printToScreen(" ");
@@ -230,10 +235,11 @@ void sendMessagePage(){
 			HAL_UART_Transmit(&huart4, sendBuffer,sendBufferMaxSize , 50);
 			clearScreen();
 			clearBufferString(sendBuffer,sendBufferMaxSize);
+			BufferLen = 0;
 			printToScreen("send Message");
 		}
 
-		if(keyPadReading != 'n' && BufferLen <= 14){
+		if(keyPadReading != 'n' && BufferLen <= 14 && keyPadReading != '#'){
 			sendBuffer[BufferLen] = keyPadReading;
 			BufferLen += 1;
 			clearScreen();
@@ -246,6 +252,7 @@ void sendMessagePage(){
 }
 void getMessagePage(){
 	uint8_t getBuffer[15];
+	uint8_t getBufferPrev[15];
 	printToScreen("get Message");
 	while(1){
 		if(getOneCharFromKeypad() == '2'){
@@ -255,10 +262,14 @@ void getMessagePage(){
 		}
 		HAL_Delay(5);
 		//TODO
+		hardcopy_char(getBuffer,15,getBufferPrev);
 		HAL_UART_Receive(&huart4,getBuffer, 15, 50);
-		clearScreen();
-		printToScreen((char *)getBuffer);
-
+		if(strcmp((char *)getBuffer,(char *)getBufferPrev)!=0){
+			clearScreen();
+			printToScreen("get Message");
+			printToScreen(" ");
+			printToScreen((char *)getBuffer);
+		}
 	}
 }
 void testSpeakerPage(){
