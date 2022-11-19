@@ -391,7 +391,8 @@ int main(void)
 	  //testOLEDScreenDriverPrint();
 	  //testCryotoSystem();
 	  //take keypad input to flip page
-	  UILogic();
+	  //UILogic();
+	  testSend();
 	  HAL_Delay(50);
 
     /* USER CODE END WHILE */
