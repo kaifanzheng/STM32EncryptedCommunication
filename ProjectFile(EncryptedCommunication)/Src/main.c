@@ -56,8 +56,12 @@ I2C_HandleTypeDef hi2c1;
 
 OSPI_HandleTypeDef hospi1;
 
+SPI_HandleTypeDef hspi3;
+
 TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim3;
+
+UART_HandleTypeDef huart4;
 
 /* USER CODE BEGIN PV */
 uint8_t ringtone_note_1[note_1_size];
@@ -80,6 +84,8 @@ static void MX_TIM2_Init(void);
 static void MX_TIM3_Init(void);
 static void MX_OCTOSPI1_Init(void);
 static void MX_I2C1_Init(void);
+static void MX_SPI3_Init(void);
+static void MX_UART4_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -133,6 +139,11 @@ void play_ringtone(){
 	HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_2, ringtone, 22932, DAC_ALIGN_8B_R);
 }
 //ui start###################################################################
+void clearBufferString(uint8_t *buffer, uint8_t bufferSize){
+	for(uint8_t i=0;i<bufferSize;i++){
+		buffer[i] = 0;
+	}
+}
 void displayMainPageOne(){
 	printToScreen("main menu");
 	printToScreen(" ");
@@ -200,17 +211,41 @@ void wifiOptionPage(){
 	}
 }
 void sendMessagePage(){
+	//inite for buffer senting
+	const int sendBufferMaxSize = 15;
+	uint8_t sendBuffer[sendBufferMaxSize];
+	int BufferLen = 0;
+	clearBufferString(sendBuffer,sendBufferMaxSize);
+
 	printToScreen("send Message");
 	while(1){
-		if(getOneCharFromKeypad() == '2'){
+		char keyPadReading = getOneCharFromKeypad();
+		if(keyPadReading == '2'){
 			ExitToMain();
 			break;
 		}
-		HAL_Delay(20);
-		//TODO
+		HAL_Delay(50);
+		//
+		if(keyPadReading == '#'){
+			HAL_UART_Transmit(&huart4, sendBuffer,sendBufferMaxSize , 50);
+			clearScreen();
+			clearBufferString(sendBuffer,sendBufferMaxSize);
+			printToScreen("send Message");
+		}
+
+		if(keyPadReading != 'n' && BufferLen <= 14){
+			sendBuffer[BufferLen] = keyPadReading;
+			BufferLen += 1;
+			clearScreen();
+			printToScreen("send Message");
+			printToScreen(" ");
+			printToScreen((char *)sendBuffer);
+		}
+
 	}
 }
 void getMessagePage(){
+	uint8_t getBuffer[15];
 	printToScreen("get Message");
 	while(1){
 		if(getOneCharFromKeypad() == '2'){
@@ -218,8 +253,12 @@ void getMessagePage(){
 			break;
 
 		}
-		HAL_Delay(20);
+		HAL_Delay(5);
 		//TODO
+		HAL_UART_Receive(&huart4,getBuffer, 15, 50);
+		clearScreen();
+		printToScreen((char *)getBuffer);
+
 	}
 }
 void testSpeakerPage(){
@@ -317,6 +356,8 @@ int main(void)
   MX_TIM3_Init();
   MX_OCTOSPI1_Init();
   MX_I2C1_Init();
+  MX_SPI3_Init();
+  MX_UART4_Init();
   /* USER CODE BEGIN 2 */
 
   // Testssd1306Driver();
@@ -540,6 +581,46 @@ static void MX_OCTOSPI1_Init(void)
 }
 
 /**
+  * @brief SPI3 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_SPI3_Init(void)
+{
+
+  /* USER CODE BEGIN SPI3_Init 0 */
+
+  /* USER CODE END SPI3_Init 0 */
+
+  /* USER CODE BEGIN SPI3_Init 1 */
+
+  /* USER CODE END SPI3_Init 1 */
+  /* SPI3 parameter configuration*/
+  hspi3.Instance = SPI3;
+  hspi3.Init.Mode = SPI_MODE_MASTER;
+  hspi3.Init.Direction = SPI_DIRECTION_2LINES;
+  hspi3.Init.DataSize = SPI_DATASIZE_4BIT;
+  hspi3.Init.CLKPolarity = SPI_POLARITY_LOW;
+  hspi3.Init.CLKPhase = SPI_PHASE_1EDGE;
+  hspi3.Init.NSS = SPI_NSS_SOFT;
+  hspi3.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
+  hspi3.Init.FirstBit = SPI_FIRSTBIT_MSB;
+  hspi3.Init.TIMode = SPI_TIMODE_DISABLE;
+  hspi3.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
+  hspi3.Init.CRCPolynomial = 7;
+  hspi3.Init.CRCLength = SPI_CRC_LENGTH_DATASIZE;
+  hspi3.Init.NSSPMode = SPI_NSS_PULSE_ENABLE;
+  if (HAL_SPI_Init(&hspi3) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN SPI3_Init 2 */
+
+  /* USER CODE END SPI3_Init 2 */
+
+}
+
+/**
   * @brief TIM2 Initialization Function
   * @param None
   * @retval None
@@ -630,6 +711,54 @@ static void MX_TIM3_Init(void)
 }
 
 /**
+  * @brief UART4 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_UART4_Init(void)
+{
+
+  /* USER CODE BEGIN UART4_Init 0 */
+
+  /* USER CODE END UART4_Init 0 */
+
+  /* USER CODE BEGIN UART4_Init 1 */
+
+  /* USER CODE END UART4_Init 1 */
+  huart4.Instance = UART4;
+  huart4.Init.BaudRate = 9600;
+  huart4.Init.WordLength = UART_WORDLENGTH_8B;
+  huart4.Init.StopBits = UART_STOPBITS_1;
+  huart4.Init.Parity = UART_PARITY_NONE;
+  huart4.Init.Mode = UART_MODE_TX_RX;
+  huart4.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart4.Init.OverSampling = UART_OVERSAMPLING_16;
+  huart4.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+  huart4.Init.ClockPrescaler = UART_PRESCALER_DIV1;
+  huart4.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+  if (HAL_UART_Init(&huart4) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_UARTEx_SetTxFifoThreshold(&huart4, UART_TXFIFO_THRESHOLD_1_8) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_UARTEx_SetRxFifoThreshold(&huart4, UART_RXFIFO_THRESHOLD_1_8) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_UARTEx_DisableFifoMode(&huart4) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN UART4_Init 2 */
+
+  /* USER CODE END UART4_Init 2 */
+
+}
+
+/**
   * Enable DMA controller clock
   */
 static void MX_DMA_Init(void)
@@ -665,7 +794,10 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(GPIOA, C3_Pin|C4_Pin|C2_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, C1_Pin|LED_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, C1_Pin|GPIO_PIN_12|GPIO_PIN_13|LED_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_8|GPIO_PIN_0, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : Button_Pin */
   GPIO_InitStruct.Pin = Button_Pin;
@@ -692,12 +824,25 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : C1_Pin LED_Pin */
-  GPIO_InitStruct.Pin = C1_Pin|LED_Pin;
+  /*Configure GPIO pins : C1_Pin PB12 PB13 LED_Pin */
+  GPIO_InitStruct.Pin = C1_Pin|GPIO_PIN_12|GPIO_PIN_13|LED_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : PE8 PE0 */
+  GPIO_InitStruct.Pin = GPIO_PIN_8|GPIO_PIN_0;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : PE1 */
+  GPIO_InitStruct.Pin = GPIO_PIN_1;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
   HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
