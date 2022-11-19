@@ -330,6 +330,41 @@ void UILogic(){
 	}
 }
 
+//test for data transfer----
+void testSend(){
+	uint8_t charToTransmit[1];
+	/* USER CODE END 0 */
+
+	  /* USER CODE BEGIN WHILE */
+	  while (1)
+	  {
+	    if(HAL_GPIO_ReadPin(Button_GPIO_Port, Button_Pin) == GPIO_PIN_RESET)
+	    {
+	      charToTransmit[0] = 48; // 48 is ascii character for zero
+	    }
+	    else
+	    {
+	      charToTransmit[0] = 49; // 49 is ascii character for one
+	    }
+	    HAL_UART_Transmit(&huart4, charToTransmit, 1, 100);
+	    HAL_Delay(200);
+	  }
+}
+
+void testGet(){
+	uint8_t receivedData[1];
+	 while (1)
+	  {
+	    HAL_UART_Receive(&huart4, receivedData, 1, 100);
+	    if (receivedData[0] == '0'){
+	      HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, 0);
+	    } else if (receivedData[0] == '1'){
+	      HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, 1);
+	    }
+
+	  }
+}
+
 
 /* USER CODE END 0 */
 
@@ -390,9 +425,11 @@ int main(void)
 	  //testKeypadDriver();
 	  //testOLEDScreenDriverPrint();
 	  //testCryotoSystem();
-	  //take keypad input to flip page
-	  //UILogic();
 	  testSend();
+	  //take keypad input to flip page
+
+	  //UILogic();
+
 	  HAL_Delay(50);
 
     /* USER CODE END WHILE */

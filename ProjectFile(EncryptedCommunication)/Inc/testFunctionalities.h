@@ -16,6 +16,8 @@ void Testssd1306Driver();
 void testOLEDScreenDriverPrint();
 void testKeypadDriver();
 void testCryotoSystem();
+void testSend();
+void testGet();
 
 
 #endif /* INC_TESTSDD1306_H_ */

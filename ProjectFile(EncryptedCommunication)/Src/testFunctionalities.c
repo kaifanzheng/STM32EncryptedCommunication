@@ -88,37 +88,3 @@ void testCryotoSystem(){
 	uint32_t encodeResult = encode(getPublicMod(),getPublicKey(),4);
 	uint32_t decodeResult = decode(getPublicMod(),getPrivateKey(),encodeResult);
 }
-
-void testSend(){
-	uint8_t charToTransmit[1];
-	/* USER CODE END 0 */
-
-	  /* USER CODE BEGIN WHILE */
-	  while (1)
-	  {
-	    if(HAL_GPIO_ReadPin(Button_Port, Button_Pin) == GPIO_PIN_RESET)
-	    {
-	      charToTransmit[0] = 48; // 48 is ascii character for zero
-	    }
-	    else
-	    {
-	      charToTransmit[0] = 49; // 49 is ascii character for one
-	    }
-	    HAL_UART_Transmit(&huart1, charToTransmit, 1, 100);
-	    HAL_Delay(200);
-	  }
-}
-
-void testGet(){
-	uint8_t receivedData[1];
-	 while (1)
-	  {
-	    HAL_UART_Receive(&huart1, receivedData, 1, 100);
-	    if (receivedData[0] == '0'){
-	      HAL_GPIO_WritePin(LED_Port, LED_PIN, 0);
-	    } else if (receivedData[0] == '1'){
-	      HAL_GPIO_WritePin(LED_Port, LED_PIN, 1);
-	    }
-
-	  }
-}
