@@ -224,12 +224,15 @@ void ExitToMain(){
 }
 void wifiOptionPage(){
 	printToScreen("Wi-Fi option");
+	printToScreen("");
+	printToScreen("stop dreaming");
+	printToScreen("no wi-fi");
 	while(1){
-		if(getOneCharFromKeypad() == '2'){
+		if(getOneCharFromKeypad() == 'A'){
 			ExitToMain();
 			break;
 		}
-		HAL_Delay(20);
+		HAL_Delay(100);
 		//TODO
 	}
 }
@@ -243,14 +246,15 @@ void sendMessagePage(){
 	printToScreen("send Message");
 	while(1){
 		char keyPadReading = getOneCharFromKeypad();
-		if(keyPadReading == '2'){
+		if(keyPadReading == 'A'){
 			ExitToMain();
 			break;
 		}
-		HAL_Delay(50);
+		HAL_Delay(100);
 		//
 		if(keyPadReading == '#'){
-			HAL_UART_Transmit(&huart4, sendBuffer,sendBufferMaxSize , 50);
+			HAL_UART_Init(&huart4);
+			HAL_UART_Transmit(&huart4, sendBuffer,sendBufferMaxSize , 10000);
 			clearScreen();
 			clearBufferString(sendBuffer,sendBufferMaxSize);
 			BufferLen = 0;
@@ -272,46 +276,80 @@ void getMessagePage(){
 	uint8_t getBuffer[15];
 	uint8_t getBufferPrev[15];
 	printToScreen("get Message");
-	while(1){
-		if(getOneCharFromKeypad() == '2'){
-			ExitToMain();
-			break;
-
-		}
+	uint8_t quit = 1;
+	while(quit){
 		HAL_Delay(5);
 		//TODO
 		hardcopy_char(getBuffer,15,getBufferPrev);
-		HAL_UART_Receive(&huart4,getBuffer, 15, 50);
+		clearBufferString(getBuffer,15);
+		while(getBuffer[0] == 0){
+			HAL_UART_Init(&huart4);
+			HAL_UART_Receive(&huart4,getBuffer, 15, 5000);
+			HAL_Delay(10);
+		}
 		if(strcmp((char *)getBuffer,(char *)getBufferPrev)!=0){
 			clearScreen();
 			printToScreen("get Message");
 			printToScreen(" ");
 			printToScreen((char *)getBuffer);
+			printToScreen("press 1 quit");
+			printToScreen("press 3 keep");
+		}
+		while(1){
+			if(getOneCharFromKeypad() == '3'){
+				clearScreen();
+				printToScreen("get Message");
+				printToScreen(" ");
+				//printToScreen((char *)getBuffer);
+				break;
+			}else if(getOneCharFromKeypad() == '1'){
+				quit = 0;
+				break;
+			}
+			HAL_Delay(50);
 		}
 	}
 }
 void testSpeakerPage(){
 	printToScreen("testing speaker");
 	printToScreen(" ");
-	printToScreen("press 2 exit");
+	printToScreen("press A exit");
 	while(1){
-		if(getOneCharFromKeypad() == '2'){
+		if(getOneCharFromKeypad() == 'A'){
 			ExitToMain();
 			break;
 		}
 		play_ringtone();
-		HAL_Delay(20);
+		HAL_Delay(100);
 	}
 }
 void getTemperaturePage(){
-	printToScreen("temperature is:");
+	float tem =0;
+	float hum =0;
+	float temp = 0;
+	float hump = 0;
 	while(1){
-		if(getOneCharFromKeypad() == '2'){
+		if(getOneCharFromKeypad() == 'A'){
 			ExitToMain();
 			break;
 		}
-		HAL_Delay(20);
-		//TODO
+		HAL_Delay(100);
+		temp = tem;
+		hump = hum;
+		tem = read_temperature();
+		hum = read_humidity();
+		if(temp != tem || hump != hum){
+			clearScreen();
+			char temBuf[15];
+			char humBuf[15];
+			gcvt(tem, 8, temBuf);
+			gcvt(hum, 8, humBuf);
+			printToScreen("t and h are:");
+			printToScreen("");
+			printToScreen(temBuf);
+			printToScreen( humBuf);
+
+		}
 	}
 }
 
@@ -342,7 +380,7 @@ void UILogic(){
 			mainMenuPage += 1;
 			changePageMainPage();
 		}
-	}else if(keypadInputMain == '2'){
+	}else if(keypadInputMain == 'A'){
 		HAL_Delay(100);
 		enterPageMainPage();
 	}
@@ -350,34 +388,39 @@ void UILogic(){
 
 //test for data transfer----
 void testSend(){
-	uint8_t charToTransmit[1];
-	  while (1)
-	  {
-	    if(HAL_GPIO_ReadPin(Button_GPIO_Port, Button_Pin) == GPIO_PIN_RESET)
-	    {
-	      charToTransmit[0] = 48; // 48 is ascii character for zero
-	    }
-	    else
-	    {
-	      charToTransmit[0] = 49; // 49 is ascii character for one
-	    }
-	    HAL_UART_Transmit(&huart4, charToTransmit, 1, 100);
-	    HAL_Delay(200);
-	  }
+	//HAL_UART_Init(&huart4);
+	uint8_t buf[5];
+	uint8_t counter = 0;
+	while(1){
+		clearBufferString(buf,5);
+		if(counter % 2 == 0){
+			sprintf(buf, "hello");
+			HAL_UART_Transmit(&huart4, (uint8_t*) buf, (uint16_t) strlen(buf), 10000);
+			printToScreen("sent hello");
+		}else{
+			sprintf(buf, "happy");
+			HAL_UART_Transmit(&huart4, (uint8_t*) buf, (uint16_t) strlen(buf), 10000);
+			printToScreen("sent happy");
+		}
+//		sprintf(buf, "hello");
+//		HAL_UART_Transmit(&huart4, (uint8_t*) buf, (uint16_t) strlen(buf), 10000);
+		counter = (counter+1)%4;
+		HAL_Delay(2000);
+	}
 }
 
-void testGet(){
-	uint8_t receivedData[1];
-	 while (1)
-	  {
-	    HAL_UART_Receive(&huart4, receivedData, 1, 100);
-	    if (receivedData[0] == '0'){
-	      HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, 0);
-	    } else if (receivedData[0] == '1'){
-	      HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, 1);
-	    }
 
-	  }
+void testGet(){
+	//HAL_UART_Init(&huart4);
+	uint8_t buf[5];
+	while(1){
+//		printToScreen("start to get:");
+//		printToScreen("");
+		clearBufferString(buf,5);
+		HAL_UART_Receive(&huart4, (uint8_t*) buf, (uint16_t) 5, 10000);
+		printToScreen((char *) buf);
+		HAL_Delay(1000);
+	}
 }
 
 
@@ -428,6 +471,7 @@ int main(void)
   HAL_TIM_Base_Start_IT(&htim2);
   BSP_HSENSOR_Init();
   BSP_TSENSOR_Init();
+  HAL_UART_Init(&huart4);
   // play_ringtone();
   play_ringtone();
   //initeScreen and UI
@@ -448,11 +492,12 @@ int main(void)
 	  //testOLEDScreenDriverPrint();
 	  //testCryotoSystem();
 	  //testSend();
+	  //testGet();
 	  //take keypad input to flip page
 
-	  //UILogic();
+	  UILogic();
 
-	  HAL_Delay(50);
+	  HAL_Delay(100);
 
     /* USER CODE END WHILE */
 
