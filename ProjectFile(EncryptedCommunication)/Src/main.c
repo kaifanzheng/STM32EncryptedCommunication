@@ -27,6 +27,12 @@
 #include "arm_math.h"
 #include "keypadDriver.h"
 #include "cryptosystem.h"
+#include "stm32l4s5i_iot01_hsensor.h"
+#include "stm32l4s5i_iot01_tsensor.h"
+
+#include "../Components/hts221/hts221.c"
+#include "stm32l4s5i_iot01_tsensor.h"
+#include "stm32l4s5i_iot01_hsensor.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -53,6 +59,7 @@ DAC_HandleTypeDef hdac1;
 DMA_HandleTypeDef hdma_dac1_ch2;
 
 I2C_HandleTypeDef hi2c1;
+I2C_HandleTypeDef hi2c2;
 
 OSPI_HandleTypeDef hospi1;
 
@@ -86,12 +93,22 @@ static void MX_OCTOSPI1_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_SPI3_Init(void);
 static void MX_UART4_Init(void);
+static void MX_I2C2_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+float read_temperature(){
+	return BSP_TSENSOR_ReadTemp();
+}
+
+float read_humidity(){
+	return BSP_HSENSOR_ReadHumidity();
+}
+
+
 void generate_ringtone(uint8_t pDest[], uint8_t harmonic){
 	  //================================= GENERATE SINE WAVES FOR RINGTONE =================================
 	  float offset = ((2.0/3.0)*256)/2.0; // Add first sine wave and 2nd harmonic
@@ -138,6 +155,7 @@ void generate_ringtone(uint8_t pDest[], uint8_t harmonic){
 void play_ringtone(){
 	HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_2, ringtone, 22932, DAC_ALIGN_8B_R);
 }
+
 //ui start###################################################################
 void clearBufferString(uint8_t *buffer, uint8_t bufferSize){
 	for(uint8_t i=0;i<bufferSize;i++){
@@ -333,9 +351,6 @@ void UILogic(){
 //test for data transfer----
 void testSend(){
 	uint8_t charToTransmit[1];
-	/* USER CODE END 0 */
-
-	  /* USER CODE BEGIN WHILE */
 	  while (1)
 	  {
 	    if(HAL_GPIO_ReadPin(Button_GPIO_Port, Button_Pin) == GPIO_PIN_RESET)
@@ -404,12 +419,15 @@ int main(void)
   MX_I2C1_Init();
   MX_SPI3_Init();
   MX_UART4_Init();
+  MX_I2C2_Init();
   /* USER CODE BEGIN 2 */
 
   // Testssd1306Driver();
   // generate_ringtone(ringtone_note_1, ringtone_note_2, ringtone_note_3, ringtone_note_4);
   generate_ringtone(ringtone, 1);
   HAL_TIM_Base_Start_IT(&htim2);
+  BSP_HSENSOR_Init();
+  BSP_TSENSOR_Init();
   // play_ringtone();
   play_ringtone();
   //initeScreen and UI
@@ -420,12 +438,16 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  float t;
+  float h;
   while (1)
   {
+	  t = read_temperature();
+	  h = read_humidity();
 	  //testKeypadDriver();
 	  //testOLEDScreenDriverPrint();
 	  //testCryotoSystem();
-	  testSend();
+	  //testSend();
 	  //take keypad input to flip page
 
 	  //UILogic();
@@ -578,6 +600,54 @@ static void MX_I2C1_Init(void)
   /* USER CODE BEGIN I2C1_Init 2 */
 
   /* USER CODE END I2C1_Init 2 */
+
+}
+
+/**
+  * @brief I2C2 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_I2C2_Init(void)
+{
+
+  /* USER CODE BEGIN I2C2_Init 0 */
+
+  /* USER CODE END I2C2_Init 0 */
+
+  /* USER CODE BEGIN I2C2_Init 1 */
+
+  /* USER CODE END I2C2_Init 1 */
+  hi2c2.Instance = I2C2;
+  hi2c2.Init.Timing = 0x10909CEC;
+  hi2c2.Init.OwnAddress1 = 0;
+  hi2c2.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+  hi2c2.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+  hi2c2.Init.OwnAddress2 = 0;
+  hi2c2.Init.OwnAddress2Masks = I2C_OA2_NOMASK;
+  hi2c2.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+  hi2c2.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+  if (HAL_I2C_Init(&hi2c2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Configure Analogue filter
+  */
+  if (HAL_I2CEx_ConfigAnalogFilter(&hi2c2, I2C_ANALOGFILTER_ENABLE) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Configure Digital filter
+  */
+  if (HAL_I2CEx_ConfigDigitalFilter(&hi2c2, 0) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN I2C2_Init 2 */
+
+  /* USER CODE END I2C2_Init 2 */
 
 }
 
