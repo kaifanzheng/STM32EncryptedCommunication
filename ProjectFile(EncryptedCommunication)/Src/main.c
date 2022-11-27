@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "cmsis_os.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -42,10 +43,6 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define note_1_size 32
-#define note_2_size 36
-#define note_3_size 38
-#define note_4_size 34
 #define time_between_note 130
 /* USER CODE END PD */
 
@@ -70,16 +67,14 @@ TIM_HandleTypeDef htim3;
 
 UART_HandleTypeDef huart4;
 
+osThreadId screenTaskHandle;
+osThreadId pollingTaskHandle;
 /* USER CODE BEGIN PV */
-uint8_t ringtone_note_1[note_1_size];
-uint8_t ringtone_note_2[note_2_size];
-uint8_t ringtone_note_3[note_3_size];
-uint8_t ringtone_note_4[note_4_size];
-
 uint8_t ringtone[22932]; // All notes in one array, DMA can be performed in one go
-
 uint8_t mainMenuPage = 0;
 const uint8_t maxMenuPageNum = 5;
+float t;
+float h;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -94,6 +89,9 @@ static void MX_I2C1_Init(void);
 static void MX_SPI3_Init(void);
 static void MX_UART4_Init(void);
 static void MX_I2C2_Init(void);
+void StartScreenTask(void const * argument);
+void StartPollingTask(void const * argument);
+
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -109,7 +107,7 @@ float read_humidity(){
 }
 
 
-void generate_ringtone(uint8_t pDest[], uint8_t harmonic){
+void generate_ringtone(uint8_t pDest[], uint8_t harmonic, uint8_t note_sizes[]){
 	  //================================= GENERATE SINE WAVES FOR RINGTONE =================================
 	  float offset = ((2.0/3.0)*256)/2.0; // Add first sine wave and 2nd harmonic
 	  float offset_harmonic = ((2.0/3.0)*256)/8.0;
@@ -118,37 +116,30 @@ void generate_ringtone(uint8_t pDest[], uint8_t harmonic){
 	  float step_size;
 	  float input_harmonic_1 = 0;
 	  float step_size_harmonic_1;
-	  float input_harmonic_2 = 0;
-	  float step_size_harmonic_2;
 	  // Fill array with values:
 	  for(int i = 0; i < 22932; i++){
 		  if(i == 0){
 			  input = 0;
-			  step_size = (2.0*PI)/note_1_size;
-			  step_size_harmonic_1 = (2.0*PI)/(note_1_size * 2);
-			  step_size_harmonic_2 = (2.0*PI)/(note_1_size * 4);
+			  step_size = (2.0*PI)/note_sizes[0];
+			  step_size_harmonic_1 = (2.0*PI)/(note_sizes[0] * 2);
 		  } else if(i == note_sample_length){
 			  input = 0;
-			  step_size = (2.0*PI)/note_2_size;
-			  step_size_harmonic_1 = (2.0*PI)/(note_2_size * 2);
-			  step_size_harmonic_2 = (2.0*PI)/(note_2_size * 4);
+			  step_size = (2.0*PI)/note_sizes[1];
+			  step_size_harmonic_1 = (2.0*PI)/(note_sizes[1] * 2);
 		  } else if(i == note_sample_length * 2){
 			  input = 0;
-			  step_size = (2.0*PI)/note_3_size;
-			  step_size_harmonic_1 = (2.0*PI)/(note_3_size * 2);
-			  step_size_harmonic_2 = (2.0*PI)/(note_3_size * 4);
+			  step_size = (2.0*PI)/note_sizes[2];
+			  step_size_harmonic_1 = (2.0*PI)/(note_sizes[2] * 2);
 		  } else if(i == note_sample_length * 3){
 			  input = 0;
-			  step_size = (2.0*PI)/note_4_size;
-			  step_size_harmonic_1 = (2.0*PI)/(note_4_size * 2);
-			  step_size_harmonic_2 = (2.0*PI)/(note_4_size * 4);
+			  step_size = (2.0*PI)/note_sizes[3];
+			  step_size_harmonic_1 = (2.0*PI)/(note_sizes[3] * 2);
 		  }
 		  pDest[i] = offset + arm_sin_f32(input)*offset;
 		  if(harmonic) pDest[i] += offset_harmonic + arm_sin_f32(input_harmonic_1)*offset_harmonic;
 		  // pDest[i] += offset_harmonic + arm_sin_f32(input_harmonic_2)*offset_harmonic;
 		  input += step_size;
 		  input_harmonic_1 += step_size_harmonic_1;
-		  input_harmonic_2 += step_size_harmonic_2;
 	  }
 }
 
@@ -173,35 +164,30 @@ void displayMainPageOne(){
 	printToScreen(" ");
 	printToScreen("   Wi-Fi option  >");
 }
-
 void displayMainPageTwo(){
 	printToScreen("main menu");
 	printToScreen(" ");
 	printToScreen(" ");
 	printToScreen("<  send message >");
 }
-
 void displayMainPageThree(){
 	printToScreen("main menu");
 	printToScreen(" ");
 	printToScreen(" ");
 	printToScreen("< receive message>");
 }
-
 void displayMainPageFour(){
 	printToScreen("main menu");
 	printToScreen(" ");
 	printToScreen(" ");
 	printToScreen("<  test speaker  >");
 }
-
 void displayMainPageFive(){
 	printToScreen("main menu");
 	printToScreen(" ");
 	printToScreen(" ");
 	printToScreen("<show temperature ");
 }
-
 void changePageMainPage(){
 	  clearScreen();
 	  if(mainMenuPage == 0){
@@ -216,7 +202,6 @@ void changePageMainPage(){
 		  displayMainPageFive();
 	  }
 }
-
 void ExitToMain(){
 	mainMenuPage = 0;
 	clearScreen();
@@ -352,7 +337,6 @@ void getTemperaturePage(){
 		}
 	}
 }
-
 void enterPageMainPage(){
 	  clearScreen();
 	  if(mainMenuPage == 0){
@@ -367,7 +351,6 @@ void enterPageMainPage(){
 		  getTemperaturePage();
 	  }
 }
-
 void UILogic(){
 	char keypadInputMain = getOneCharFromKeypad();
 	if(keypadInputMain == '1'){
@@ -385,7 +368,6 @@ void UILogic(){
 		enterPageMainPage();
 	}
 }
-
 //test for data transfer----
 void testSend(){
 	//HAL_UART_Init(&huart4);
@@ -408,8 +390,6 @@ void testSend(){
 		HAL_Delay(2000);
 	}
 }
-
-
 void testGet(){
 	//HAL_UART_Init(&huart4);
 	uint8_t buf[5];
@@ -422,7 +402,6 @@ void testGet(){
 		HAL_Delay(1000);
 	}
 }
-
 
 /* USER CODE END 0 */
 
@@ -442,7 +421,14 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
+  InitScreen();
+  HAL_TIM_Base_Start_IT(&htim2);
+  BSP_HSENSOR_Init();
+  BSP_TSENSOR_Init();
+  HAL_UART_Init(&huart4);
 
+  uint8_t note_sizes[] = {32, 36, 38, 34};
+  generate_ringtone(ringtone, 1, note_sizes);
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -465,37 +451,47 @@ int main(void)
   MX_I2C2_Init();
   /* USER CODE BEGIN 2 */
 
-  // Testssd1306Driver();
-  // generate_ringtone(ringtone_note_1, ringtone_note_2, ringtone_note_3, ringtone_note_4);
-  generate_ringtone(ringtone, 1);
-  HAL_TIM_Base_Start_IT(&htim2);
-  BSP_HSENSOR_Init();
-  BSP_TSENSOR_Init();
-  HAL_UART_Init(&huart4);
-  // play_ringtone();
-  play_ringtone();
-  //initeScreen and UI
-  InitScreen();
-  displayMainPageOne();
-
   /* USER CODE END 2 */
 
+  /* USER CODE BEGIN RTOS_MUTEX */
+  /* add mutexes, ... */
+  /* USER CODE END RTOS_MUTEX */
+
+  /* USER CODE BEGIN RTOS_SEMAPHORES */
+  /* add semaphores, ... */
+  /* USER CODE END RTOS_SEMAPHORES */
+
+  /* USER CODE BEGIN RTOS_TIMERS */
+  /* start timers, add new ones, ... */
+  /* USER CODE END RTOS_TIMERS */
+
+  /* USER CODE BEGIN RTOS_QUEUES */
+  /* add queues, ... */
+  /* USER CODE END RTOS_QUEUES */
+
+  /* Create the thread(s) */
+  /* definition and creation of screenTask */
+  osThreadDef(screenTask, StartScreenTask, osPriorityNormal, 0, 128);
+  screenTaskHandle = osThreadCreate(osThread(screenTask), NULL);
+
+  /* definition and creation of pollingTask */
+  osThreadDef(pollingTask, StartPollingTask, osPriorityNormal, 0, 128);
+  pollingTaskHandle = osThreadCreate(osThread(pollingTask), NULL);
+
+  /* USER CODE BEGIN RTOS_THREADS */
+  /* add threads, ... */
+  /* USER CODE END RTOS_THREADS */
+
+  /* Start scheduler */
+  osKernelStart();
+
+  /* We should never get here as control is now taken by the scheduler */
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  float t;
-  float h;
   while (1)
   {
 	  t = read_temperature();
 	  h = read_humidity();
-	  //testKeypadDriver();
-	  //testOLEDScreenDriverPrint();
-	  //testCryotoSystem();
-	  //testSend();
-	  //testGet();
-	  //take keypad input to flip page
-
-	  UILogic();
 
 	  HAL_Delay(100);
 
@@ -934,7 +930,7 @@ static void MX_DMA_Init(void)
 
   /* DMA interrupt init */
   /* DMA1_Channel1_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 0, 0);
+  HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 5, 0);
   HAL_NVIC_EnableIRQ(DMA1_Channel1_IRQn);
 
 }
@@ -1009,7 +1005,7 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
-  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
+  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 5, 0);
   HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 
 }
@@ -1017,6 +1013,69 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 
 /* USER CODE END 4 */
+
+/* USER CODE BEGIN Header_StartScreenTask */
+/**
+  * @brief  Function implementing the screenTask thread.
+  * @param  argument: Not used
+  * @retval None
+  */
+/* USER CODE END Header_StartScreenTask */
+void StartScreenTask(void const * argument)
+{
+  /* USER CODE BEGIN 5 */
+  //initeScreen and UI
+  displayMainPageOne();
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+    UILogic();
+  }
+  /* USER CODE END 5 */
+}
+
+/* USER CODE BEGIN Header_StartPollingTask */
+/**
+* @brief Function implementing the pollingTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartPollingTask */
+void StartPollingTask(void const * argument)
+{
+  /* USER CODE BEGIN StartPollingTask */
+  /*
+   * TASK #2: Polling for the keyboard and message polling
+   */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END StartPollingTask */
+}
+
+/**
+  * @brief  Period elapsed callback in non blocking mode
+  * @note   This function is called  when TIM6 interrupt took place, inside
+  * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
+  * a global variable "uwTick" used as application time base.
+  * @param  htim : TIM handle
+  * @retval None
+  */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  /* USER CODE BEGIN Callback 0 */
+
+  /* USER CODE END Callback 0 */
+  if (htim->Instance == TIM6) {
+    HAL_IncTick();
+  }
+  /* USER CODE BEGIN Callback 1 */
+
+  /* USER CODE END Callback 1 */
+}
 
 /**
   * @brief  This function is executed in case of error occurrence.
