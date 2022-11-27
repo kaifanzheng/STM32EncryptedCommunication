@@ -261,7 +261,7 @@ void sendMessagePage(){
 			printToScreen("send Message");
 		}
 
-		if(keyPadReading != 'n' && BufferLen <= 14 && keyPadReading != '#'){
+		if((keyPadReading != 'n') && (BufferLen <= 14) && (keyPadReading != '#')&&(keyPadReading != '*')){
 			sendBuffer[BufferLen] = keyPadReading;
 			BufferLen += 1;
 			clearScreen();
@@ -284,31 +284,21 @@ void getMessagePage(){
 		clearBufferString(getBuffer,15);
 		while(getBuffer[0] == 0){
 			HAL_UART_Init(&huart4);
-			HAL_UART_Receive(&huart4,getBuffer, 15, 5000);
+			HAL_UART_Receive(&huart4,getBuffer, 15, 100);
 			HAL_Delay(10);
+			if(getOneCharFromKeypad() == 'A'){
+				quit = 0;
+				break;
+			}
 		}
 		if(strcmp((char *)getBuffer,(char *)getBufferPrev)!=0){
 			clearScreen();
 			printToScreen("get Message");
 			printToScreen(" ");
 			printToScreen((char *)getBuffer);
-			printToScreen("press 1 quit");
-			printToScreen("press 3 keep");
-		}
-		while(1){
-			if(getOneCharFromKeypad() == '3'){
-				clearScreen();
-				printToScreen("get Message");
-				printToScreen(" ");
-				//printToScreen((char *)getBuffer);
-				break;
-			}else if(getOneCharFromKeypad() == '1'){
-				quit = 0;
-				break;
-			}
-			HAL_Delay(50);
 		}
 	}
+	ExitToMain();
 }
 void testSpeakerPage(){
 	printToScreen("testing speaker");
