@@ -233,28 +233,24 @@ void ExitToMain(){
 	displayMainPageOne();
 }
 
-uint32_t* splitString(char *str, char splitBy){
-	uint32_t result[2];
+void split(char * strin,char * splitBy, uint32_t* result){
+    int counter = 0;
     char *pt;
-    pt = strtok (str,splitBy);
-    uint8_t counter = 0;
+    pt = strtok (strin,splitBy);
     while (pt != NULL) {
-    	if(counter >= 2){
-    		break;
-    	}
         int a = atoi(pt);
         result[counter] = a;
         counter ++;
         pt = strtok (NULL, splitBy);
     }
-    return result;
 }
 int RandomNumberGenerator(const int nMin, const int nMax){
   int nRandonNumber = 0;
   nRandonNumber = rand()%(nMax-nMin) + nMin;
   return nRandonNumber;
 }
-void wifiOptionPage(){
+int wifiOptionPage(){
+	uint8_t cExit = 0;
 	char publicIndexs[32];
     for(uint8_t i=0;i<32;i++){
     	publicIndexs[i] = 0;
@@ -273,6 +269,7 @@ void wifiOptionPage(){
 			char keyPadReading = getOneCharFromKeypad();
 			if(keyPadReading == 'A'){
 				ExitToMain();
+				return 0;
 				break;
 			}
 			HAL_Delay(100);
@@ -301,6 +298,7 @@ void wifiOptionPage(){
 			char keyPadReading = getOneCharFromKeypad();
 			if(keyPadReading == 'A'){
 				ExitToMain();
+				return 0;
 				break;
 			}
 			HAL_Delay(100);
@@ -370,6 +368,7 @@ void wifiOptionPage(){
 		char keyPadReading = getOneCharFromKeypad();
 		if(keyPadReading == 'A'){
 			ExitToMain();
+			return 0;
 			break;
 		}
 		uint8_t timeOut[4] = {50,100,150,200};
@@ -385,6 +384,11 @@ void wifiOptionPage(){
 			printToScreen(" ");
 			printToScreen("message got:");
 			printToScreen(getBuffer);
+			uint32_t result[2];
+			split(getBuffer,",",result);
+			publicMod = result[0];
+			publicPower = result[1];
+
 			isGot = 1;
 			break;
 		}
@@ -394,6 +398,7 @@ void wifiOptionPage(){
 		char keyPadReading = getOneCharFromKeypad();
 		if(keyPadReading == 'A'){
 			ExitToMain();
+			return 0;
 			break;
 		}
 
@@ -401,6 +406,17 @@ void wifiOptionPage(){
 		HAL_UART_Transmit(&huart4,(uint8_t *)publicIndexs,32 , 100);
 	}
 
+}
+
+void decodeGetMessage(uint8_t *buffer,uint32_t size,uint32_t publicModi, uint32_t privateKeyi){
+	for(uint32_t i=0;i<size;i++){
+		buffer[i] = decode(publicModi,privateKeyi,buffer[i]);
+	}
+}
+void encodeSendMessage(uint8_t *buffer,uint32_t size,uint32_t publicModi, uint32_t publicKey){
+	for(uint32_t i=0;i<size;i++){
+		buffer[i] = encode(publicModi,publicKey,buffer[i]);
+	}
 }
 void sendMessagePage(){
 	//init for buffer sending
@@ -419,6 +435,7 @@ void sendMessagePage(){
 		HAL_Delay(100);
 		//
 		if(keyPadReading == '#'){
+			encodeSendMessage(sendBuffer,sendBufferMaxSize,publicMod,publicPower);
 			HAL_UART_Init(&huart4);
 			HAL_UART_Transmit(&huart4, sendBuffer,sendBufferMaxSize , 10000);
 			clearScreen();
@@ -542,6 +559,21 @@ void UILogic(){
 	}
 }
 
+void getMessageMain(){
+	uint8_t getBuffer[15];
+	clearBufferString(getBuffer,15);
+	HAL_UART_Init(&huart4);
+	if(HAL_UART_Receive(&huart4,getBuffer, 15, 100) == HAL_OK && getBuffer[0] != 0){
+		decodeGetMessage(getBuffer,15,publicMod, thePrivateKey);
+		clearScreen();
+		printToScreen("Received: ");
+		printToScreen(" ");
+		printToScreen((char *)getBuffer);
+		HAL_Delay(3000);
+		ExitToMain();
+	}
+}
+
 //test for data transfer----
 void testSend(){
 	//HAL_UART_Init(&huart4);
@@ -638,12 +670,8 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  float t;
-  float h;
   while (1)
   {
-	  t = read_temperature();
-	  h = read_humidity();
 	  //testKeypadDriver();
 	  //testOLEDScreenDriverPrint();
 	  //testCryotoSystem();
@@ -653,7 +681,7 @@ int main(void)
 
 	  UILogic();
 
-	  HAL_Delay(100);
+	  getMessageMain();
 
     /* USER CODE END WHILE */
 
