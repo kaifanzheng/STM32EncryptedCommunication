@@ -85,6 +85,9 @@ uint8_t ringtone[22932]; // All notes in one array, DMA can be performed in one 
 
 uint8_t mainMenuPage = 0;
 const uint8_t maxMenuPageNum = 5;
+uint8_t message_history_buffer[500][15];
+uint8_t message_history_encoded[500][15];
+uint32_t next_message_in_history = 0;
 
 uint32_t publicMod;
 uint32_t publicPower;
@@ -202,7 +205,7 @@ void displayMainPageFour(){
 	printToScreen("main menu");
 	printToScreen(" ");
 	printToScreen(" ");
-	printToScreen("<  test speaker  >");
+	printToScreen("<message history>");
 }
 
 void displayMainPageFive(){
@@ -484,15 +487,36 @@ void getMessagePage(){
 	ExitToMain();
 }
 void testSpeakerPage(){
-	printToScreen("testing speaker");
+	uint32_t i = 1;
+	char c;
+	printToScreen("msg history");
 	printToScreen(" ");
-	printToScreen("press A exit");
+	printToScreen(message_history_buffer[next_message_in_history - i]);
+	printToScreen(message_history_encoded[next_message_in_history - i]);
 	while(1){
-		if(getOneCharFromKeypad() == 'A'){
+		c = getOneCharFromKeypad();
+		if(c == 'A'){
 			ExitToMain();
 			break;
+		} else if(c == '3'){
+			if(i != next_message_in_history-1){
+				i += 1;
+				clearScreen();
+				printToScreen("msg history");
+				printToScreen(" ");
+				printToScreen(message_history_buffer[next_message_in_history - i]);
+				printToScreen(message_history_encoded[next_message_in_history - i]);
+			}
+		} else if(c == '1'){
+			if(i != 1){
+				i -= 1;
+				clearScreen();
+				printToScreen("msg history");
+				printToScreen(" ");
+				printToScreen(message_history_buffer[next_message_in_history - i]);
+				printToScreen(message_history_encoded[next_message_in_history - i]);
+			}
 		}
-		play_ringtone();
 		HAL_Delay(100);
 	}
 }
@@ -563,13 +587,13 @@ void getMessageMain(){
 	uint8_t getBuffer[15];
 	clearBufferString(getBuffer,15);
 	HAL_UART_Init(&huart4);
-	if(HAL_UART_Receive(&huart4,getBuffer, 15, 100) == HAL_OK && getBuffer[0] != 0){
+	if(HAL_UART_Receive(&huart4,getBuffer, 15, 100) == HAL_OK && getBuffer[0] != 0 && strchr((char*)getBuffer, ',') == NULL){
+		hardcopy_char(getBuffer, 15, message_history_encoded[next_message_in_history]);
 		decodeGetMessage(getBuffer,15,publicMod, thePrivateKey);
 		clearScreen();
-		printToScreen("Received: ");
-		printToScreen(" ");
-		printToScreen((char *)getBuffer);
-		HAL_Delay(3000);
+		hardcopy_char(getBuffer, 15, message_history_buffer[next_message_in_history]);
+		play_ringtone();
+		next_message_in_history = (next_message_in_history+1)%1024;
 		ExitToMain();
 	}
 }
