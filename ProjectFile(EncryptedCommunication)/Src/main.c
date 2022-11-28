@@ -33,6 +33,11 @@
 #include "../Components/hts221/hts221.c"
 #include "stm32l4s5i_iot01_tsensor.h"
 #include "stm32l4s5i_iot01_hsensor.h"
+
+#include<stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -80,6 +85,11 @@ uint8_t ringtone[22932]; // All notes in one array, DMA can be performed in one 
 
 uint8_t mainMenuPage = 0;
 const uint8_t maxMenuPageNum = 5;
+
+uint32_t publicMod;
+uint32_t publicPower;
+uint32_t thePrivateKey;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -171,7 +181,7 @@ void displayMainPageOne(){
 	printToScreen("main menu");
 	printToScreen(" ");
 	printToScreen(" ");
-	printToScreen("   Wi-Fi option  >");
+	printToScreen("init communicate>");
 }
 
 void displayMainPageTwo(){
@@ -222,22 +232,178 @@ void ExitToMain(){
 	clearScreen();
 	displayMainPageOne();
 }
+
+uint32_t* splitString(char *str, char splitBy){
+	uint32_t result[2];
+    char *pt;
+    pt = strtok (str,splitBy);
+    uint8_t counter = 0;
+    while (pt != NULL) {
+    	if(counter >= 2){
+    		break;
+    	}
+        int a = atoi(pt);
+        result[counter] = a;
+        counter ++;
+        pt = strtok (NULL, splitBy);
+    }
+    return result;
+}
+int RandomNumberGenerator(const int nMin, const int nMax){
+  int nRandonNumber = 0;
+  nRandonNumber = rand()%(nMax-nMin) + nMin;
+  return nRandonNumber;
+}
 void wifiOptionPage(){
-	printToScreen("Wi-Fi option");
-	printToScreen("");
-	printToScreen("stop dreaming");
-	printToScreen("no wi-fi");
+	char publicIndexs[32];
+    for(uint8_t i=0;i<32;i++){
+    	publicIndexs[i] = 0;
+    }
 	while(1){
-		if(getOneCharFromKeypad() == 'A'){
+		const int enterBufferMaxSize = 5;
+		uint8_t enterBuffer[enterBufferMaxSize];
+		int enterBufferLen = 0;
+		clearBufferString(enterBuffer,enterBufferMaxSize);
+
+		uint32_t p = 4;//init as a illegal value
+		uint32_t q = 4;
+		printToScreen("enter fist prime");
+		//find p by entering the value
+		while(1){
+			char keyPadReading = getOneCharFromKeypad();
+			if(keyPadReading == 'A'){
+				ExitToMain();
+				break;
+			}
+			HAL_Delay(100);
+			if(keyPadReading == '#'){
+				p = atoi(enterBuffer);
+				clearScreen();
+				clearBufferString(enterBuffer,enterBufferMaxSize);
+				enterBufferLen = 0;
+				break;
+			}
+			if((keyPadReading != 'n') && (enterBufferLen <= enterBufferMaxSize-1) && (keyPadReading != '#')&&(keyPadReading != '*') &&
+					(keyPadReading != 'A') && (keyPadReading != 'B')&& (keyPadReading != 'C') &&(keyPadReading != 'D')){
+				enterBuffer[enterBufferLen] = keyPadReading;
+				enterBufferLen += 1;
+				clearScreen();
+				printToScreen("enter fist prime");
+				printToScreen(" ");
+				printToScreen((char *)enterBuffer);
+			}
+		}
+
+		printToScreen("second prime");
+		clearBufferString(enterBuffer,enterBufferMaxSize);
+
+		while(1){
+			char keyPadReading = getOneCharFromKeypad();
+			if(keyPadReading == 'A'){
+				ExitToMain();
+				break;
+			}
+			HAL_Delay(100);
+			if(keyPadReading == '#'){
+				q = atoi(enterBuffer);
+				clearScreen();
+				clearBufferString(enterBuffer,enterBufferMaxSize);
+				enterBufferLen = 0;
+				break;
+			}
+			if((keyPadReading != 'n') && (enterBufferLen <= enterBufferMaxSize-1) && (keyPadReading != '#')&&(keyPadReading != '*') &&
+					(keyPadReading != 'A') && (keyPadReading != 'B')&& (keyPadReading != 'C') &&(keyPadReading != 'D')){
+				enterBuffer[enterBufferLen] = keyPadReading;
+				enterBufferLen += 1;
+				clearScreen();
+				printToScreen("second prime");
+				printToScreen(" ");
+				printToScreen((char *)enterBuffer);
+			}
+		}
+		printToScreen("Initializing..");
+		if(IniteCrypto(p,q) == 1){
+			printToScreen("input OK");
+			thePrivateKey = getPrivateKey();
+			printToScreen("your pKey is:");
+			char pkey[32];
+		    for(uint8_t i=0;i<32;i++){
+		    	pkey[i] = 0;
+		    }
+			itoa(thePrivateKey, pkey, 10);
+			printToScreen(pkey);
+			//mod
+			uint32_t theMod = getPublicMod();
+			char pmod[16];
+		    for(uint8_t i=0;i<16;i++){
+		    	pmod[i] = 0;
+		    }
+			itoa(theMod, pmod, 10);
+			//and power
+			uint32_t thePower = getPublicKey();
+			char pPower[16];
+		    for(uint8_t i=0;i<16;i++){
+		    	pPower[i] = 0;
+		    }
+			itoa(thePower, pPower, 10);
+			//cat
+			strcat(publicIndexs,pmod);
+			strcat(publicIndexs,",");
+			strcat(publicIndexs,pPower);
+			printToScreen("your m&p is:");
+			printToScreen(publicIndexs);
+			HAL_Delay(2000);
+			break;
+		}else{
+			printToScreen(" ");
+			printToScreen("input failed");
+			HAL_Delay(1000);
+			clearScreen();
+		}
+	}
+
+	uint32_t counter = 0;
+	printToScreen("Connecting..");
+	uint8_t isGot = 0;
+	srand(time(NULL));
+	while(1){
+		char keyPadReading = getOneCharFromKeypad();
+		if(keyPadReading == 'A'){
 			ExitToMain();
 			break;
 		}
-		HAL_Delay(100);
-		//TODO
+		uint8_t timeOut[4] = {50,100,150,200};
+		uint8_t getBuffer[32];
+		clearBufferString(getBuffer,32);
+		HAL_UART_Init(&huart4);
+		HAL_UART_Transmit(&huart4,(uint8_t *)publicIndexs,32 , 100);
+		HAL_UART_Init(&huart4);
+		HAL_UART_Receive(&huart4, getBuffer,32 ,(timeOut[RandomNumberGenerator(0,4)]));
+		if(getBuffer[0] != 0){
+			clearScreen();
+			printToScreen("Initializing..");
+			printToScreen(" ");
+			printToScreen("message got:");
+			printToScreen(getBuffer);
+			isGot = 1;
+			break;
+		}
 	}
+	printToScreen("transmitting..");
+	while(isGot){
+		char keyPadReading = getOneCharFromKeypad();
+		if(keyPadReading == 'A'){
+			ExitToMain();
+			break;
+		}
+
+		HAL_UART_Init(&huart4);
+		HAL_UART_Transmit(&huart4,(uint8_t *)publicIndexs,32 , 100);
+	}
+
 }
 void sendMessagePage(){
-	//inite for buffer senting
+	//init for buffer sending
 	const int sendBufferMaxSize = 15;
 	uint8_t sendBuffer[sendBufferMaxSize];
 	int BufferLen = 0;
