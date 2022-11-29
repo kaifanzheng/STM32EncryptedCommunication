@@ -85,13 +85,13 @@ uint8_t ringtone[22932]; // All notes in one array, DMA can be performed in one 
 
 uint8_t mainMenuPage = 0;
 const uint8_t maxMenuPageNum = 5;
-uint8_t message_history_buffer[500][15];
-uint8_t message_history_encoded[500][15];
+uint32_t message_history_buffer[500][15];
+uint32_t message_history_encoded[500][15];
 uint32_t next_message_in_history = 0;
 
-uint32_t publicMod;
-uint32_t publicPower;
-uint32_t thePrivateKey;
+uint32_t publicMod = 91;
+uint32_t publicPower = 5;
+uint32_t thePrivateKey = 29;
 
 /* USER CODE END PV */
 
@@ -175,7 +175,7 @@ void clearBufferString(uint8_t *buffer, uint8_t bufferSize){
 		buffer[i] = 0;
 	}
 }
-void hardcopy_char(uint8_t *buffer, uint8_t bufferSize, uint8_t *bufferCopy){
+void hardcopy_char(uint32_t *buffer, uint32_t bufferSize, uint32_t *bufferCopy){
 	for(uint8_t i =0;i<bufferSize;i++){
 		bufferCopy[i] = buffer[i];
 	}
@@ -308,7 +308,7 @@ int wifiOptionPage(){
 			if(keyPadReading == '#'){
 				q = atoi(enterBuffer);
 				clearScreen();
-				clearBufferString(enterBuffer,enterBufferMaxSize);
+				//clearBufferString(enterBuffer,enterBufferMaxSize);
 				enterBufferLen = 0;
 				break;
 			}
@@ -322,6 +322,11 @@ int wifiOptionPage(){
 				printToScreen((char *)enterBuffer);
 			}
 		}
+
+		if(enterBuffer[0] == 0){
+			continue;
+		}
+
 		printToScreen("Initializing..");
 		if(IniteCrypto(p,q) == 1){
 			printToScreen("input OK");
@@ -411,14 +416,21 @@ int wifiOptionPage(){
 
 }
 
-void decodeGetMessage(uint8_t *buffer,uint32_t size,uint32_t publicModi, uint32_t privateKeyi){
+void decodeGetMessage(uint32_t *buffer,uint32_t size,uint32_t publicModi, uint32_t privateKeyi){
 	for(uint32_t i=0;i<size;i++){
 		buffer[i] = decode(publicModi,privateKeyi,buffer[i]);
 	}
 }
-void encodeSendMessage(uint8_t *buffer,uint32_t size,uint32_t publicModi, uint32_t publicKey){
+void encodeSendMessage(uint8_t *buffer,char *resultBuffer,uint32_t size,uint32_t publicModi, uint32_t publicKey){
+	char x[32];
 	for(uint32_t i=0;i<size;i++){
-		buffer[i] = encode(publicModi,publicKey,buffer[i]);
+		if(buffer[i]!=0){
+			clearBufferString(x,32);
+			uint32_t index = encode(publicModi,publicKey,buffer[i]);
+			itoa(index,x, 10);
+			strcat(resultBuffer,x);
+			strcat(resultBuffer,".");
+		}
 	}
 }
 void sendMessagePage(){
@@ -438,9 +450,13 @@ void sendMessagePage(){
 		HAL_Delay(100);
 		//
 		if(keyPadReading == '#'){
-			encodeSendMessage(sendBuffer,sendBufferMaxSize,publicMod,publicPower);
+			char resultBuffer[64];
+			for(uint32_t i = 0;i<64;i++){
+				resultBuffer[i] = 0;
+			}
+			encodeSendMessage(sendBuffer,resultBuffer,sendBufferMaxSize,publicMod,publicPower);
 			HAL_UART_Init(&huart4);
-			HAL_UART_Transmit(&huart4, sendBuffer,sendBufferMaxSize , 10000);
+			HAL_UART_Transmit(&huart4, (uint8_t *)resultBuffer,64 , 10000);
 			clearScreen();
 			clearBufferString(sendBuffer,sendBufferMaxSize);
 			BufferLen = 0;
@@ -455,7 +471,6 @@ void sendMessagePage(){
 			printToScreen(" ");
 			printToScreen((char *)sendBuffer);
 		}
-
 	}
 }
 void getMessagePage(){
@@ -491,8 +506,18 @@ void testSpeakerPage(){
 	char c;
 	printToScreen("msg history");
 	printToScreen(" ");
-	printToScreen(message_history_buffer[next_message_in_history - i]);
-	printToScreen(message_history_encoded[next_message_in_history - i]);
+	char result[15];
+	for(uint8_t i = 0;i<15;i++){
+		result[i] = 0;
+	}
+	for(uint8_t j =0;j<15;j++){
+		result[j] = (char)(uint8_t)message_history_buffer[next_message_in_history - i][j];
+	}
+	printToScreen(result);
+	for(uint8_t j =0;j<15;j++){
+		result[j] = (char)(uint8_t)message_history_encoded[next_message_in_history - i][j];
+	}
+	printToScreen(result);
 	while(1){
 		c = getOneCharFromKeypad();
 		if(c == 'A'){
@@ -504,8 +529,8 @@ void testSpeakerPage(){
 				clearScreen();
 				printToScreen("msg history");
 				printToScreen(" ");
-				printToScreen(message_history_buffer[next_message_in_history - i]);
-				printToScreen(message_history_encoded[next_message_in_history - i]);
+				printToScreen((uint8_t *)message_history_buffer[next_message_in_history - i]);
+				printToScreen((uint8_t *)message_history_encoded[next_message_in_history - i]);
 			}
 		} else if(c == '1'){
 			if(i != 1){
@@ -513,8 +538,8 @@ void testSpeakerPage(){
 				clearScreen();
 				printToScreen("msg history");
 				printToScreen(" ");
-				printToScreen(message_history_buffer[next_message_in_history - i]);
-				printToScreen(message_history_encoded[next_message_in_history - i]);
+				printToScreen((uint8_t *)message_history_buffer[next_message_in_history - i]);
+				printToScreen((uint8_t *)message_history_encoded[next_message_in_history - i]);
 			}
 		}
 		HAL_Delay(100);
@@ -584,14 +609,19 @@ void UILogic(){
 }
 
 void getMessageMain(){
-	uint8_t getBuffer[15];
-	clearBufferString(getBuffer,15);
+	uint8_t getBuffer[64];
+	clearBufferString(getBuffer,64);
 	HAL_UART_Init(&huart4);
-	if(HAL_UART_Receive(&huart4,getBuffer, 15, 100) == HAL_OK && getBuffer[0] != 0 && strchr((char*)getBuffer, ',') == NULL){
-		hardcopy_char(getBuffer, 15, message_history_encoded[next_message_in_history]);
-		decodeGetMessage(getBuffer,15,publicMod, thePrivateKey);
+	if(HAL_UART_Receive(&huart4,getBuffer, 64, 100) == HAL_OK && getBuffer[0] != 0 && strchr((char*)getBuffer, ',') == NULL){
+		uint32_t result[15];
+		for(uint32_t i=0;i<15;i++){
+			result[i] = 0;
+		}
+		split(getBuffer,".",result);
+		hardcopy_char(result, 15, message_history_encoded[next_message_in_history]);
+		decodeGetMessage(result,15,publicMod, thePrivateKey);
 		clearScreen();
-		hardcopy_char(getBuffer, 15, message_history_buffer[next_message_in_history]);
+		hardcopy_char(result, 15, message_history_buffer[next_message_in_history]);
 		play_ringtone();
 		next_message_in_history = (next_message_in_history+1)%1024;
 		ExitToMain();
