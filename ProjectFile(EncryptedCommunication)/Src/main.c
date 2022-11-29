@@ -89,9 +89,9 @@ uint32_t message_history_buffer[500][15];
 uint32_t message_history_encoded[500][15];
 uint32_t next_message_in_history = 0;
 
-uint32_t publicMod = 91;
-uint32_t publicPower = 5;
-uint32_t thePrivateKey = 29;
+uint32_t publicMod = 3127;
+uint32_t publicPower = 3;
+uint32_t thePrivateKey = 2011;
 
 /* USER CODE END PV */
 
@@ -113,6 +113,7 @@ static void MX_I2C2_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+int getMessageMain();
 float read_temperature(){
 	return BSP_TSENSOR_ReadTemp();
 }
@@ -253,6 +254,9 @@ int RandomNumberGenerator(const int nMin, const int nMax){
   return nRandonNumber;
 }
 int wifiOptionPage(){
+	printToScreen("Init");
+	HAL_Delay(200);
+	clearScreen();
 	uint8_t cExit = 0;
 	char publicIndexs[32];
     for(uint8_t i=0;i<32;i++){
@@ -441,6 +445,7 @@ void sendMessagePage(){
 	clearBufferString(sendBuffer,sendBufferMaxSize);
 
 	printToScreen("send Message");
+	HAL_Delay(200);
 	while(1){
 		char keyPadReading = getOneCharFromKeypad();
 		if(keyPadReading == 'A'){
@@ -453,6 +458,20 @@ void sendMessagePage(){
 			char resultBuffer[64];
 			for(uint32_t i = 0;i<64;i++){
 				resultBuffer[i] = 0;
+			}
+			if(sendBuffer[0] == 'B'){
+				clearBufferString(sendBuffer,sendBufferMaxSize);
+				char x[15];
+				int temp = read_temperature();
+				itoa(temp,x, 10);
+				strcat(sendBuffer,x);
+
+			}else if(sendBuffer[0] == 'C'){
+				clearBufferString(sendBuffer,sendBufferMaxSize);
+				char x[15];
+				int temp = read_humidity();
+				itoa(temp,x, 10);
+				strcat(sendBuffer,x);
 			}
 			encodeSendMessage(sendBuffer,resultBuffer,sendBufferMaxSize,publicMod,publicPower);
 			HAL_UART_Init(&huart4);
@@ -474,49 +493,55 @@ void sendMessagePage(){
 	}
 }
 void getMessagePage(){
-	uint8_t getBuffer[15];
-	uint8_t getBufferPrev[15];
 	printToScreen("get Message");
-	uint8_t quit = 1;
-	while(quit){
-		HAL_Delay(5);
-		//TODO
-		hardcopy_char(getBuffer,15,getBufferPrev);
-		clearBufferString(getBuffer,15);
-		while(getBuffer[0] == 0){
-			HAL_UART_Init(&huart4);
-			HAL_UART_Receive(&huart4,getBuffer, 15, 100);
-			HAL_Delay(10);
-			if(getOneCharFromKeypad() == 'A'){
-				quit = 0;
-				break;
+	HAL_Delay(200);
+	while(1){
+		char keyPadReading = getOneCharFromKeypad();
+		if(keyPadReading == 'A'){
+			ExitToMain();
+			break;
+		}
+		uint8_t getBuffer[64];
+		clearBufferString(getBuffer,64);
+		HAL_UART_Init(&huart4);
+		if(HAL_UART_Receive(&huart4,getBuffer, 64, 250) == HAL_OK && getBuffer[0] != 0 && strchr((char*)getBuffer, ',') == NULL){
+			uint32_t result[15];
+			for(uint32_t i=0;i<15;i++){
+				result[i] = 0;
 			}
+			split(getBuffer,".",result);
+			uint8_t mes[15];
+			for(uint8_t i=0;i<15;i++){
+				mes[i] = (uint8_t) result[i];
+			}
+			printToScreen((char *) mes);
 		}
-		if(strcmp((char *)getBuffer,(char *)getBufferPrev)!=0){
-			clearScreen();
-			printToScreen("get Message");
-			printToScreen(" ");
-			printToScreen((char *)getBuffer);
-		}
+
 	}
 	ExitToMain();
 }
 void testSpeakerPage(){
+	if(next_message_in_history == 0){
+		return;
+	}
 	uint32_t i = 1;
 	char c;
 	printToScreen("msg history");
+	HAL_Delay(200);
 	printToScreen(" ");
 	char result[15];
 	for(uint8_t i = 0;i<15;i++){
 		result[i] = 0;
 	}
 	for(uint8_t j =0;j<15;j++){
-		result[j] = (char)(uint8_t)message_history_buffer[next_message_in_history - i][j];
-	}
-	printToScreen(result);
-	for(uint8_t j =0;j<15;j++){
 		result[j] = (char)(uint8_t)message_history_encoded[next_message_in_history - i][j];
 	}
+	printToScreen("received:");
+	printToScreen(result);
+	for(uint8_t j =0;j<15;j++){
+		result[j] = (char)(uint8_t)message_history_buffer[next_message_in_history - i][j];
+	}
+	printToScreen("decoded:");
 	printToScreen(result);
 	while(1){
 		c = getOneCharFromKeypad();
@@ -524,28 +549,62 @@ void testSpeakerPage(){
 			ExitToMain();
 			break;
 		} else if(c == '3'){
-			if(i != next_message_in_history-1){
+			if(i < next_message_in_history-1){
 				i += 1;
 				clearScreen();
 				printToScreen("msg history");
 				printToScreen(" ");
-				printToScreen((uint8_t *)message_history_buffer[next_message_in_history - i]);
-				printToScreen((uint8_t *)message_history_encoded[next_message_in_history - i]);
+				for(uint8_t j =0;j<15;j++){
+					result[j] = (char)(uint8_t)message_history_encoded[next_message_in_history - i][j];
+				}
+				printToScreen("received:");
+				printToScreen(result);
+				for(uint8_t j =0;j<15;j++){
+					result[j] = (char)(uint8_t)message_history_buffer[next_message_in_history - i][j];
+				}
+				printToScreen("decoded:");
+				printToScreen(result);
 			}
 		} else if(c == '1'){
-			if(i != 1){
+			if(i > 1){
 				i -= 1;
 				clearScreen();
 				printToScreen("msg history");
 				printToScreen(" ");
-				printToScreen((uint8_t *)message_history_buffer[next_message_in_history - i]);
-				printToScreen((uint8_t *)message_history_encoded[next_message_in_history - i]);
+				for(uint8_t j =0;j<15;j++){
+					result[j] = (char)(uint8_t)message_history_encoded[next_message_in_history - i][j];
+				}
+				printToScreen("received:");
+				printToScreen(result);
+				for(uint8_t j =0;j<15;j++){
+					result[j] = (char)(uint8_t)message_history_buffer[next_message_in_history - i][j];
+				}
+				printToScreen("decoded:");
+				printToScreen(result);
 			}
 		}
-		HAL_Delay(100);
+		if(getMessageMain() == 1){
+			i = 1;
+			clearScreen();
+			printToScreen("msg history");
+			printToScreen(" ");
+			for(uint8_t j =0;j<15;j++){
+				result[j] = (char)(uint8_t)message_history_encoded[next_message_in_history - i][j];
+			}
+			printToScreen("received:");
+			printToScreen(result);
+			for(uint8_t j =0;j<15;j++){
+				result[j] = (char)(uint8_t)message_history_buffer[next_message_in_history - i][j];
+			}
+			printToScreen("decoded:");
+			printToScreen(result);
+		}
+		//HAL_Delay(100);
 	}
 }
 void getTemperaturePage(){
+	printToScreen("Data");
+	HAL_Delay(100);
 	float tem =0;
 	float hum =0;
 	float temp = 0;
@@ -555,7 +614,7 @@ void getTemperaturePage(){
 			ExitToMain();
 			break;
 		}
-		HAL_Delay(100);
+		HAL_Delay(200);
 		temp = tem;
 		hump = hum;
 		tem = read_temperature();
@@ -603,29 +662,30 @@ void UILogic(){
 			changePageMainPage();
 		}
 	}else if(keypadInputMain == 'A'){
-		HAL_Delay(100);
 		enterPageMainPage();
 	}
 }
 
-void getMessageMain(){
+int getMessageMain(){
+	int x = 0;
 	uint8_t getBuffer[64];
 	clearBufferString(getBuffer,64);
 	HAL_UART_Init(&huart4);
-	if(HAL_UART_Receive(&huart4,getBuffer, 64, 100) == HAL_OK && getBuffer[0] != 0 && strchr((char*)getBuffer, ',') == NULL){
+	if(HAL_UART_Receive(&huart4,getBuffer, 64, 275) == HAL_OK && getBuffer[0] != 0 && strchr((char*)getBuffer, ',') == NULL){
+		x = 1;
 		uint32_t result[15];
 		for(uint32_t i=0;i<15;i++){
 			result[i] = 0;
 		}
 		split(getBuffer,".",result);
 		hardcopy_char(result, 15, message_history_encoded[next_message_in_history]);
-		decodeGetMessage(result,15,publicMod, thePrivateKey);
-		clearScreen();
+		decodeGetMessage(result,15,getPublicMod(), thePrivateKey);
+		//clearScreen();
 		hardcopy_char(result, 15, message_history_buffer[next_message_in_history]);
 		play_ringtone();
 		next_message_in_history = (next_message_in_history+1)%1024;
-		ExitToMain();
 	}
+	return x;
 }
 
 //test for data transfer----
@@ -719,6 +779,7 @@ int main(void)
   //initeScreen and UI
   InitScreen();
   displayMainPageOne();
+  IniteCrypto(53, 59);
 
   /* USER CODE END 2 */
 

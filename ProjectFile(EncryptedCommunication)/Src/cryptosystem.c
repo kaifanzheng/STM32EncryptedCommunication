@@ -5,6 +5,7 @@
  *      Author: nsaiy
  */
 #include "cryptosystem.h"
+#include "asm.h"
 uint32_t p;
 uint32_t q;
 uint32_t phiN;
@@ -44,7 +45,7 @@ uint32_t emod(uint32_t a, uint32_t  b, uint32_t  c){
 }
 
 uint8_t IniteCrypto(uint32_t userInputP, uint32_t userInputQ){
-	if(isPrime(userInputP) == 0 || isPrime(userInputQ) == 0){
+	if(asmisPrime(userInputP) == 0 || asmisPrime(userInputQ) == 0){
 		return 0;//cannot inite
 	}
 	p = userInputP;
@@ -52,7 +53,7 @@ uint8_t IniteCrypto(uint32_t userInputP, uint32_t userInputQ){
 	N = p*q;
 	phiN = (p-1)*(q-1);
 	for(uint32_t i =2;i<phiN;i++){
-		if(isCoprime(i,N) && isCoprime(i,phiN)){
+		if(asmisCoprime(i,N) && asmisCoprime(i,phiN)){
 			e = i;
 			break;
 		}
@@ -75,12 +76,12 @@ uint8_t IniteCrypto(uint32_t userInputP, uint32_t userInputQ){
 
 
 uint32_t encode(uint32_t publicMode,uint32_t publicPower, uint32_t num){
-	uint32_t result=  emod(num,publicPower,publicMode);
+	uint32_t result=  asmemod(num,publicPower,publicMode);
 	return result;
 }
 
 uint32_t decode(uint32_t publicMode,uint32_t privatePower, uint32_t num){
-	uint32_t result =  emod(num,privatePower,publicMode);
+	uint32_t result =  asmemod(num,privatePower,publicMode);
 	return result;
 }
 
